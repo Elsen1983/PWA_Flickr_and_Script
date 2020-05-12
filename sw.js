@@ -78,7 +78,33 @@ self.addEventListener('install', function (e) {
 
 
 /* ----------------------- 2 - Call 'activate' event for the service worker ----------------------- */
-
+self.addEventListener('activate', function (e) {
+    log(' Activating');
+    //Wait until the following is done and only declare the service worker activated
+    //if all of the following complete successfully
+    e.waitUntil(
+        //get all the cache keys
+        caches.keys()
+            .then(function (cacheNames) {
+                return Promise.all(cacheNames.map(function (key) {
+                    // If a cached item is saved under a previous cacheName
+                    if (key !== cache_Name) {
+                        // Delete that cached file
+                        return caches.delete(key)
+                            .then(function () {
+                                log(' removes cached Files (' + key + ') from cache.');
+                            });
+                    }
+                }))
+            })
+            .then(function () {
+                log(' Activated');
+                return self.skipWaiting();
+        })
+    );
+    // Tell the active service worker to take control of the page immediately.
+    return self.clients.claim();
+});
 
 
 /* ----------------------- 3 - Call 'fetch' event for the service worker ----------------------- */
