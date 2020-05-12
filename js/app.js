@@ -23,7 +23,7 @@ function init() {
             document.getElementById("buttons_Nav").appendChild(newB);
             //add event listeners to the buttons
             newB.addEventListener("click", function () {
-                console.log("button pressed -> add this name into searchTerms");
+                console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
                 //getImages(searchTerms[i]);
             });
         }

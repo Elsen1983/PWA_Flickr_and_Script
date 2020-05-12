@@ -65,12 +65,12 @@ self.addEventListener('install', function (e) {
                 ).then(function () {
                     /* Once all the requests have been checked, the code uses cache.addAll()
                        to cache all the URLs in mutable_cache_Files and new_immutable_cache_Files. */
-                    return cache.addAll(new_immutable_cache_Files.concat(mutable_cache_Files));
-
-                }).then(function () {
-                    log(' Installed');
-                    return self.skipWaiting();
-                });
+                    return cache.addAll(new_immutable_cache_Files.concat(mutable_cache_Files))
+                        .then(function () {
+                            log(' Installed');
+                            return self.skipWaiting();
+                        });
+                })
 
             })
     );
@@ -80,8 +80,8 @@ self.addEventListener('install', function (e) {
 /* ----------------------- 2 - Call 'activate' event for the service worker ----------------------- */
 self.addEventListener('activate', function (e) {
     log(' Activating');
-    //Wait until the following is done and only declare the service worker activated
-    //if all of the following complete successfully
+    /*  Wait until the following is done and only declare the service worker activated
+        if all of the following complete successfully */
     e.waitUntil(
         //get all the cache keys
         caches.keys()
@@ -95,12 +95,12 @@ self.addEventListener('activate', function (e) {
                                 log(' removes cached Files (' + key + ') from cache.');
                             });
                     }
-                }))
+                })).then(function () {
+                    log(' Activated');
+                    return self.skipWaiting();
+                })
             })
-            .then(function () {
-                log(' Activated');
-                return self.skipWaiting();
-        })
+
     );
     // Tell the active service worker to take control of the page immediately.
     return self.clients.claim();
@@ -111,6 +111,7 @@ self.addEventListener('activate', function (e) {
 
 
 /* ----------------------- 4 - Functions ----------------------- */
+
 // each logging line will be prepended with the service worker version
 function log(message) {
     console.log("%c [ServiceWorker - '" + cache_Name + "]", 'background: #FFFFFF; color: #329011', message);
