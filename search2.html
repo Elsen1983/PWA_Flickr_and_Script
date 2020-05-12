@@ -1,0 +1,105 @@
+<!doctype html>
+<!-- Html -->
+<html class="no-js" lang="en">
+<!-- Head -->
+<head>
+  <!-- Manifest -->
+  <link href="manifest.webmanifest.json" rel="manifest">
+  <!-- Meta Tags -->
+  <!-- Set character encoding -->
+  <meta charset="utf-8">
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <meta content="yes" name="mobile-web-app-capable">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="Progressive Web Application Assignment 2020" name="application-name">
+  <meta content="PWA Assignment 2020" name="apple-mobile-web-app-title">
+  <meta content="#fafafa" name="theme-color">
+  <meta name="msapplication-navbutton-color" content="#d3faa7">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="msapplication-starturl" content="./index.html">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+
+  <meta content="Second assignment in Progressive Web Application Development 2019-2020 semester 2 search2.html"
+        name="Description">
+  <meta content="Norbert Korom" name="author"/>
+  <meta content="Norbert Korom" name="copyright"/>
+
+
+
+
+  <!-- Set title -->
+  <title>search2</title>
+  <!-- CSS link -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link href="css/search2_myCSS.css" rel="stylesheet">
+
+  <link rel="manifest" href="manifest.webmanifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Baloo+Bhai+2:800&display=swap" rel="stylesheet">
+
+</head>
+<!-- Body -->
+<body>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<div id="container">
+  <div id="product_p">
+    <h3>Use the search box to find a film script.</h3>
+  </div>
+  <div id="product">
+    <div id="product_container">
+      <p id="product_btn">Use the search box to find a film script. </p>
+      <div id="product_inner_container" style="display: none;">
+      </div>
+    </div>
+  </div>
+  <div id="title">
+    <p>Find Scripts</p>
+  </div>
+  <div id="search_box">
+    <div id="searchDiv">
+      <label>
+        <input type="text" name="search" placeholder="">
+      </label>
+      <img id="search_icon" src="img/search_icon.svg" alt="search">
+    </div>
+  </div>
+  <div id="content_area">
+<!--    <div id="loading_txt">Searching Flickr ...</div>-->
+    <div id="content_div">
+    </div>
+
+  </div>
+  <div id="footer">
+    <ul id="footer_container">
+      <li><a class="footer_link" href="index.html">Flickr Search</a></li>
+      <li><a class="footer_link" href="search2.html">Script Search</a></li>
+    </ul>
+  </div>
+</div>
+
+
+
+<script src="js/app.js"></script>
+<script src="js/vendor/modernizr-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+  window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+  ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+{
+  "short_name": "PWA assignment",
+  "name": "Progressive Web Application Assignment 2020",
+  "lang": "en-US",
+  "description": "Second assignment in Progressive Web Application Development 2019-2020",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#d3faa7",
+  "display": "standalone",
+  "theme_color": "#d3faa7"
+}
