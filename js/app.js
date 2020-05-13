@@ -8,6 +8,9 @@ window.addEventListener("load", init);
 window.addEventListener('resize', resizePage);
 
 function init() {
+
+    loadFromStorage();
+
     //check that the button_Nav is exists or not --> index.html or search2.html
     //index.html --> Flickr search
     if (typeof (document.getElementById("buttons_Nav")) != 'undefined' && document.getElementById("buttons_Nav") != null) {
@@ -30,12 +33,12 @@ function init() {
 
                 }
                 //app is online
-                else{
+                else {
                     getImages(searchTerms[i]);
                 }
             });
         }
-        loadFromStorage();
+
     }
     //search2.html --> Script search
     else {
@@ -61,18 +64,16 @@ function loadFromStorage() {
             //load the last loaded images to the screen if possible
             images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
             showImages(images_LocalStorage);
-        }
-        else{
+        } else {
             console.log("LOCALSTORAGE is EMPTY.");
         }
 
 
         //get images from localstorage
         //var images_LocalStorage = localStorage.getItem("images");
-        if(!images_LocalStorage){
+        if (!images_LocalStorage) {
             console.log("images not stored in localStorage earlier");
-        }
-        else{
+        } else {
             console.log("images stored in localStorage earlier");
             images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
             console.log(images_LocalStorage);
@@ -81,7 +82,7 @@ function loadFromStorage() {
 
     }
     //app is online
-    else{
+    else {
         let last_search_terms = window.localStorage.getItem("last_search");
         if (last_search_terms != null) {
             console.log("LOCALSTORAGE is NOT empty.");
@@ -113,13 +114,12 @@ function getImages(searchTermText) {
         that generated above (full) */
     let all_script = document.getElementsByTagName("script");
 
-    for(let i=0; i < all_script.length; i++) {
+    for (let i = 0; i < all_script.length; i++) {
         if (all_script[i].src.toString() !== full.toString()) {
             //do nothing because the script is not in the DOM
-        }
-        else{
+        } else {
             //remove the same script tag
-            all_script[i].parentNode.removeChild( all_script[i] );
+            all_script[i].parentNode.removeChild(all_script[i]);
         }
     }
     //add back as last one again
@@ -137,9 +137,10 @@ function getImages(searchTermText) {
 
 /* -------------------Handle FlickrSearch Results ------------------*/
 function showImages(images) {
+    addArrowButtons();
     console.log(images);
     console.log("%c  3 - showImages called", 'background: #222; color: #bada55');
-    if(!navigator.onLine){
+    if (!navigator.onLine) {
         console.log("OFFLINE");
     }
 
@@ -227,7 +228,6 @@ FlickrImage.prototype.getImageObject = function () {
 };
 
 
-
 function imageTitleOnModal(getTitle) {
     // console.log("getModalAndZoomImages called with title: " + getTitle);
     const modalPlace = document.getElementById("body_Tag");
@@ -249,15 +249,13 @@ function imageTitleOnModal(getTitle) {
 }
 
 
-
-
-
-
 /* ------------------------ Place Images on the Page ------------ */
 function createImages(flickr_array) {
     console.log("createImages called");
     let promiseArray = [];
+
     for (let i = 0; i < flickr_array.length; i++) {
+
         let divObj = document.createElement("li");
         divObj.className = "imageTag";
         let loader = document.createElement("img");
@@ -305,10 +303,8 @@ function disableButtons() {
 }
 
 
-
-
-
 /* ----------------------- Functions for the basic site functionalities (e.g. hide buttons) */
+
 //Show-hide menu for btn
 function hide_Menu() {
     const x = document.getElementById("product_inner_container");
@@ -326,8 +322,7 @@ function onloadFunction() {
     const x = document.getElementById("product_inner_container");
     if (window.innerWidth > 479) {
         x.style.display = "flex";
-    }
-    else{
+    } else {
         x.style.display = "none";
     }
 }
@@ -342,10 +337,44 @@ function resizePage() {
     }
 }
 
-function removeItemFromLocalStorage(key){
+function removeItemFromLocalStorage(key) {
     window.localStorage.removeItem(key);
 }
 
-function addItemToLocalStorage(key,value){
+function addItemToLocalStorage(key, value) {
     window.localStorage.setItem(key, value);
+}
+
+function addArrowButtons() {
+    //scroll down button
+    if (!document.getElementById("scrollDown")) {
+        let scrollDownButton = document.createElement("i");
+        scrollDownButton.className = "arrow down";
+        scrollDownButton.id = "scrollDown";
+        scrollDownButton.onclick = function () {
+            let element = document.getElementById("bottomOfContent");
+            element.scrollIntoView();
+            window.location.hash = '#content_div';
+        };
+        document.getElementById("topOfContent").appendChild(scrollDownButton);
+    }
+    //scroll up button
+    if (!document.getElementById("scrollUp")) {
+        let scrollUpButton = document.createElement("i");
+        scrollUpButton.className = "arrow up";
+        scrollUpButton.id = "scrollUp";
+        scrollUpButton.onclick = function () {
+            if (window.innerWidth === 479 || window.innerWidth < 479) {
+                let element = document.getElementById("topOfContent");
+                element.scrollIntoView();
+                element.focus();
+            } else {
+                let element = document.getElementById("body_Tag");
+                element.scrollIntoView();
+                window.location.hash = '#body_Tag';
+            }
+
+        };
+        document.getElementById("bottomOfContent").appendChild(scrollUpButton);
+    }
 }

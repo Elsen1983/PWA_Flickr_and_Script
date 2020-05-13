@@ -13,6 +13,20 @@ body {
   overflow-x: hidden
 }
 
+.banner {
+  align-content: center;
+  display: none;
+  justify-content: center;
+  width: 100%;
+}
+#installBtn{
+  width: 100%;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border: 1px blue solid;
+  margin-bottom: 5px;
+}
+
 button {
   font-family: inherit;
   font-size: 100%
@@ -150,8 +164,37 @@ button {
   grid-template-columns: 1fr;
   justify-content: space-around
 }
+#topOfContent{
+  height: 1em;
+  text-align: right;
+}
+#bottomOfContent{
+  height: 1em;
+  text-align: right;
+}
 
+.arrow {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 2px;
+  margin-right: 0.5em;
+}
 
+.down{
+  position: relative;
+  right: 0;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  margin-top: 5px;
+}
+
+.up{
+  position: relative;
+  right: 0;
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
 .imageTag {
   width: calc(100% - 10vw);
   height: auto;
@@ -314,6 +357,16 @@ button {
     border-radius: 5px;
     padding: 5px;
     font-size: 4.5rem
+  }
+
+  .arrow {
+    border-width: 0 6px 6px 0;
+    padding: 5px;
+  }
+
+  .down{
+  }
+  .up{
   }
 
   #content div:nth-child(3n) {

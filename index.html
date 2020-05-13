@@ -3,128 +3,163 @@
 <html class="no-js" lang="en">
 <!-- Head -->
 <head>
-  <!-- Manifest -->
-  <link href="manifest.webmanifest.json" rel="manifest">
-  <!-- Meta Tags -->
-  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-  <meta content="yes" name="mobile-web-app-capable">
-  <meta content="yes" name="apple-mobile-web-app-capable">
-  <meta content="Progressive Web Application Assignment 2020" name="application-name">
-  <meta content="PWA Assignment 2020" name="apple-mobile-web-app-title">
-  <meta content="#fafafa" name="theme-color">
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <meta name="msapplication-navbutton-color" content="#d3faa7">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="msapplication-starturl" content="./index.html">
-  <meta content="Second assignment in Progressive Web Application Development 2019-2020 semester 2 index.html"
-        name="Description">
-  <meta content="Norbert Korom" name="author"/>
-  <meta content="Norbert Korom" name="copyright"/>
+    <!-- Manifest - It is tells the browser how to style and format some of the progressive aspects. -->
+    <link href="manifest.webmanifest.json" rel="manifest">
+    <!-- Meta Tags -->
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="yes" name="mobile-web-app-capable">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="Progressive Web Application Assignment 2020" name="application-name">
+    <meta content="PWA Assignment 2020" name="apple-mobile-web-app-title">
+    <meta content="#fafafa" name="theme-color">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#d3faa7" name="msapplication-navbutton-color">
+    <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style">
+    <meta content="./index.html" name="msapplication-starturl">
+    <meta content="Second assignment in Progressive Web Application Development 2019-2020 semester 2 index.html"
+          name="Description">
+    <meta content="Norbert Korom" name="author"/>
+    <meta content="Norbert Korom" name="copyright"/>
 
 
+    <!-- Set title -->
+    <title>index</title>
 
-  <!-- Set title -->
-  <title>index</title>
-
-  <!-- CSS link -->
-  <link href="css/normalize.css" rel="stylesheet">
-  <link href="css/main.css" rel="stylesheet">
-  <link href="css/index_myCSS.css" rel="stylesheet">
+    <!-- CSS link -->
+    <link href="css/normalize.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/index_myCSS.css" rel="stylesheet">
 
 
-  <link href="icon.png" rel="icon" sizes="192x192">
-  <link href="icon.png" rel="apple-touch-icon" sizes="192x192">
-  <!-- Place favicon.ico in the root directory -->
+    <link href="icon.png" rel="icon" sizes="192x192">
+    <link href="icon.png" rel="apple-touch-icon" sizes="192x192">
+    <link href="icon_512.png" rel="icon" sizes="512x512">
+    <link href="icon_512.png" rel="apple-touch-icon" sizes="512x512">
+    <!-- Place favicon.ico in the root directory -->
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Baloo+Bhai+2:800&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Bhai+2:800&display=swap" rel="stylesheet">
 
 </head>
 <!-- Body -->
 <body id="body_Tag">
 <!--[if IE]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
-  your browser</a> to improve your experience and security.</p>
+    your browser</a> to improve your experience and security.</p>
 <![endif]-->
-
+<section id="installBanner" class="banner">
+    <button id="installBtn">Install the application.</button>
+</section>
 <!-- Add your site or application content here -->
 <!-- Add your site or application content here -->
 <div id="container">
-  <div id="product_p">
-    <h3>Searches</h3>
-  </div>
-  <div id="product">
+    <div id="product_p">
+        <h3>Searches</h3>
+    </div>
+    <div id="product">
 
-    <div id="product_container">
+        <div id="product_container">
 
-      <button id="product_btn" onclick="hide_Menu()">Searches</button>
+            <button id="product_btn" onclick="hide_Menu()">Searches</button>
 
-      <div id="product_inner_container" style="display: none;">
+            <div id="product_inner_container" style="display: none;">
 
-        <ul id="buttons_Nav">
+                <ul id="buttons_Nav">
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="title">
+        <p>Search Flickr</p>
+    </div>
+    <div id="search_box">
+        <div id="searchDiv">
+            <button id="delete_flickr_search_btn">Delete Flickr Search</button>
+        </div>
+    </div>
+    <div id="content_area">
+        <div id="topOfContent"></div>
+        <div id="loading_txt">Searching Flickr ...</div>
+        <div id="content_div"></div>
+        <div id="bottomOfContent"></div>
+
+    </div>
+    <div id="footer">
+        <ul id="footer_container">
+            <li><a class="footer_link" href="index.html">Flickr Search</a></li>
+            <li><a class="footer_link" href="search2.html">Script Search</a></li>
         </ul>
-
-      </div>
     </div>
-  </div>
-  <div id="title">
-    <p>Search Flickr</p>
-  </div>
-  <div id="search_box">
-    <div id="searchDiv">
-      <button id="delete_flickr_search_btn">Delete Flickr Search</button>
-    </div>
-  </div>
-  <div id="content_area">
-    <div id="loading_txt">Searching Flickr ...</div>
-    <div id="content_div">
-    </div>
-
-  </div>
-  <div id="footer">
-    <ul id="footer_container">
-      <li><a class="footer_link" href="index.html">Flickr Search</a></li>
-      <li><a class="footer_link" href="search2.html">Script Search</a></li>
-    </ul>
-  </div>
 </div>
 
 
 <script>
-  // ------- Service workers
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker
-        .register('sw.js', {scope: './'})
-        .then(function (registration) {
-          console.log('Service Workers registered.', registration);
-        }).catch(function (err) {
-        console.log('Service Workers failed to register.', err);
-      })
+    // ------- Service workers
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker
+                .register('sw.js', {scope: './'})
+                .then(function (registration) {
+                    console.log('Service Workers registered.', registration);
+                }).catch(function (err) {
+                console.log('Service Workers failed to register.', err);
+            })
+        });
+    } else {
+        alert("This browser does not support service workers!");
+    }
+</script>
+<script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', event => {
+
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        event.preventDefault();
+
+        // Stash the event so it can be triggered later.
+        deferredPrompt = event;
+
+        // Attach the install prompt to a user gesture
+        document.querySelector('#installBtn').addEventListener('click', event => {
+
+            // Show the prompt
+            deferredPrompt.prompt();
+
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice
+                .then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                    } else {
+                        console.log('User dismissed the A2HS prompt');
+                    }
+                    deferredPrompt = null;
+                });
+        });
+
+        // Update UI notify the user they can add to home screen
+        document.querySelector('#installBanner').style.display = 'flex';
     });
-  }
-  else{
-    alert("This browser does not support service workers!");
-  }
 </script>
 <script src="js/app.js"></script>
 <script src="js/vendor/modernizr-3.7.1.min.js"></script>
 <script crossorigin="anonymous"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
 <script src="js/plugins.js"></script>
 <script src="js/main.js"></script>
 
 <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
 <script>
-  window.ga = function () {
-    ga.q.push(arguments)
-  };
-  ga.q = [];
-  ga.l = +new Date;
-  ga('create', 'UA-XXXXX-Y', 'auto');
-  ga('set', 'transport', 'beacon');
-  ga('send', 'pageview')
+    window.ga = function () {
+        ga.q.push(arguments)
+    };
+    ga.q = [];
+    ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto');
+    ga('set', 'transport', 'beacon');
+    ga('send', 'pageview')
 </script>
 <script async src="https://www.google-analytics.com/analytics.js"></script>
 </body>
