@@ -92,23 +92,6 @@
     </div>
 </div>
 
-
-<script>
-    // ------- Service workers
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-            navigator.serviceWorker
-                .register('sw.js', {scope: './'})
-                .then(function (registration) {
-                    console.log('Service Workers registered.', registration);
-                }).catch(function (err) {
-                console.log('Service Workers failed to register.', err);
-            })
-        });
-    } else {
-        alert("This browser does not support service workers!");
-    }
-</script>
 <script>
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', event => {
@@ -150,18 +133,31 @@
 <script src="js/plugins.js"></script>
 <script src="js/main.js"></script>
 
-<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166445891-1"></script>
 <script>
-    window.ga = function () {
-        ga.q.push(arguments)
-    };
-    ga.q = [];
-    ga.l = +new Date;
-    ga('create', 'UA-XXXXX-Y', 'auto');
-    ga('set', 'transport', 'beacon');
-    ga('send', 'pageview')
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-166445891-1');
 </script>
-<script async src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+    // ------- Service workers
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker
+                .register('sw.js', {scope: './'})
+                .then(function (registration) {
+                    console.log('Service Workers registered.', registration);
+                }).catch(function (err) {
+                console.log('Service Workers failed to register.', err);
+            })
+        });
+    } else {
+        alert("This browser does not support service workers!");
+    }
+</script>
 </body>
 
 </html>

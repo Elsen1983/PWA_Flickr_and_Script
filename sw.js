@@ -17,7 +17,6 @@ const mutable_cache_Files = [
     "./icon_512.png",
     "./LICENSE",
     "./README.md",
-    "./sw.js",
     "./css/index_myCSS.css",
     "./css/main.css",
     "./css/normalize.css",
@@ -37,6 +36,14 @@ const mutable_cache_Files = [
 self.addEventListener('install', function (e) {
     log(' Installing');
     /*  The install event must wait until the promise within this is actually going to be resolved */
+    // e.waitUntil(
+    //     caches.open(cache_Name)
+    //         .then(cache => {
+    //             return cache.addAll(mutable_cache_Files);
+    //         })
+    // );
+
+
     e.waitUntil(
         /* Open 'cache_Name' from the caches */
         caches
@@ -114,6 +121,41 @@ self.addEventListener('fetch', function (e) {
     if (e.request.method !== 'GET') {
         log(" POST or PUT request!")
     }
+
+    console.log('Fetch intercepted for:', e.request.url);
+
+    e.respondWith(
+        caches.match(e.request)
+            .then(function(response) {
+                // Cache hit - return response
+                if (response) {
+                    return response;
+                }
+
+                return fetch(e.request).then(
+                    function(response) {
+                        // Check if we received a valid response
+                        if(!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+
+                        // IMPORTANT: Clone the response. A response is a stream
+                        // and because we want the browser to consume the response
+                        // as well as the cache consuming the response, we need
+                        // to clone it so we have two streams.
+                        var responseToCache = response.clone();
+
+                        caches.open(cache_Name)
+                            .then(function(cache) {
+                                cache.put(e.request, responseToCache);
+                            });
+
+                        return response;
+                    }
+                );
+            })
+    );
+
 
 });
 

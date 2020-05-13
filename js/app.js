@@ -352,9 +352,9 @@ function addArrowButtons() {
         scrollDownButton.className = "arrow down";
         scrollDownButton.id = "scrollDown";
         scrollDownButton.onclick = function () {
-            let element = document.getElementById("bottomOfContent");
-            element.scrollIntoView();
-            window.location.hash = '#content_div';
+            let lastElement = document.getElementById("bottomOfContent");
+            lastElement.scrollIntoView();
+            lastElement.focus();
         };
         document.getElementById("topOfContent").appendChild(scrollDownButton);
     }
@@ -365,13 +365,13 @@ function addArrowButtons() {
         scrollUpButton.id = "scrollUp";
         scrollUpButton.onclick = function () {
             if (window.innerWidth === 479 || window.innerWidth < 479) {
-                let element = document.getElementById("topOfContent");
-                element.scrollIntoView();
-                element.focus();
+                let firstElement = document.getElementById("topOfContent");
+                firstElement.scrollIntoView();
+                firstElement.focus();
             } else {
-                let element = document.getElementById("body_Tag");
-                element.scrollIntoView();
-                window.location.hash = '#body_Tag';
+                let firstElement = document.getElementById("body_Tag");
+                firstElement.scrollIntoView();
+                firstElement.focus();
             }
 
         };
