@@ -130,78 +130,30 @@ self.addEventListener('fetch', function (e) {
     const requestURL = new URL(e.request.url);
 
     switch (requestURL.hostname) {
-        //local request
+        /*  local request */
+        /*  skip caching local JSON file(s) */
+        /*  Check network first and if not find then send back fallback content indicating the app is offline */
         case "webdevcit.com" || "localhost":
-            log(' Fetching');
+            log(' Fetching local request');
             console.log(requestURL);
-            //local files
-            //if JSON request
-            if (/\.(json|JSON)$/.test(requestURL.href)) {
-                //skip caching local JSON file(s)
-                //check network first and if not find then send back fallback content indicating the app is offline
-
-                let fetchedP = fetch(e.request);
-                return fetchedP
-                    .then(function (resp) {
-                        return resp
-                    })
-                    .catch(function () {
-                        return new Response(
-                            "<h1>Offline</h1>",
-                            {headers: {"Content-Type": "text/html"}}
-                        );
-
-                    });
-
-            }
-            //if not JSON request
-            else {
-                e.respondWith(
-                    caches.open(cache_Name).then(function (cache) {
-                        return cache.match(e.request).then(function (response) {
-                            return response || fetch(e.request).then(function (response) {
-                                cache.put(e.request, response.clone());
-                                return response;
-                            });
-                        });
-                    })
-                );
-            }
-
             break;
 
-
-        // FLICKR requests
-        // Flickr Image requests
-        // Check Cache first, Then Network (and cache the response)
+        /* Flickr Image requests */
+        /* Check Cache first, Then Network (and cache the response) */
         case "farm66.static.flickr.com":
-            log(' Fetching');
+            log(' Fetching Flickr Image requests');
             console.log(requestURL);
-            // I know we looking for 'jpg' files only but added 'gif' too here
-            if (/\.(jpg|JPG|gif|GIF)$/.test(requestURL.href)) {
-                // console.log("---- Flickr IMAGE request detected ----");
-                e.respondWith(
-                    caches.open(cache_Name)
-                        .then(function (cache) {
-                            return cache.match(e.request)
-                                .then(response => {
-                                    return response || fetch(e.request)
-                                        .then(response => {
-                                            console.log("Image is not in the cache, so caching it.");
-                                            cache.put(e.request, response.clone());
-                                            return response;
-                                        })
-                                        .catch(function () {
-                                            //if image is missing then display the missing-image.jpg from cache
-                                            return caches.match('./img/missing_image.jpg');
-                                        });
-                                });
-                        })
-                );
-            }
-
             break;
 
+        //Flickr JSON request
+        /*  Check the Network first, if it can't be
+            accessed then just send back fallback content indicating
+            the app is offline (i.e. some JSON describing what
+            happened).*/
+        case "www.flickr.com":
+            log(' Fetching Flickr JSON request');
+            console.log(requestURL);
+            break;
     }
 
     // //https://developers.google.com/web/fundamentals/primers/service-workers
