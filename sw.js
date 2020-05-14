@@ -1,6 +1,6 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js');
+//importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js');
 
-workbox.googleAnalytics.initialize();
+//workbox.googleAnalytics.initialize();
 
 /*  Current version of the cache */
 const cache_Name = 'v1';
@@ -126,39 +126,119 @@ self.addEventListener('fetch', function (e) {
         log(" POST or PUT request!")
     }
 
-    console.log('Fetch intercepted for:', e.request.url);
+    // Parse the URL
+    const requestURL = new URL(e.request.url);
 
-    e.respondWith(
-        caches.match(e.request)
-            .then(function(response) {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
+    switch (requestURL.hostname) {
+        //local request
+        case "webdevcit.com" || "localhost":
+            log(' Fetching');
+            console.log(requestURL);
+            //local files
+            //if JSON request
+            if (/\.(json|JSON)$/.test(requestURL.href)) {
+                //skip caching local JSON file(s)
+                //check network first and if not find then send back fallback content indicating the app is offline
 
-                return fetch(e.request).then(
-                    function(response) {
-                        // Check if we received a valid response
-                        if(!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
+                let fetchedP = fetch(e.request);
+                return fetchedP
+                    .then(function (resp) {
+                        return resp
+                    })
+                    .catch(function () {
+                        return new Response(
+                            "<h1>Offline</h1>",
+                            {headers: {"Content-Type": "text/html"}}
+                        );
 
-                        // IMPORTANT: Clone the response. A response is a stream
-                        // and because we want the browser to consume the response
-                        // as well as the cache consuming the response, we need
-                        // to clone it so we have two streams.
-                        var responseToCache = response.clone();
+                    });
 
-                        caches.open(cache_Name)
-                            .then(function(cache) {
-                                cache.put(e.request, responseToCache);
+            }
+            //if not JSON request
+            else {
+                e.respondWith(
+                    caches.open(cache_Name).then(function (cache) {
+                        return cache.match(e.request).then(function (response) {
+                            return response || fetch(e.request).then(function (response) {
+                                cache.put(e.request, response.clone());
+                                return response;
                             });
-
-                        return response;
-                    }
+                        });
+                    })
                 );
-            })
-    );
+            }
+
+            break;
+
+
+        // FLICKR requests
+        // Flickr Image requests
+        // Check Cache first, Then Network (and cache the response)
+        case "farm66.static.flickr.com":
+            log(' Fetching');
+            console.log(requestURL);
+            // I know we looking for 'jpg' files only but added 'gif' too here
+            if (/\.(jpg|JPG|gif|GIF)$/.test(requestURL.href)) {
+                // console.log("---- Flickr IMAGE request detected ----");
+                e.respondWith(
+                    caches.open(cache_Name)
+                        .then(function (cache) {
+                            return cache.match(e.request)
+                                .then(response => {
+                                    return response || fetch(e.request)
+                                        .then(response => {
+                                            console.log("Image is not in the cache, so caching it.");
+                                            cache.put(e.request, response.clone());
+                                            return response;
+                                        })
+                                        .catch(function () {
+                                            //if image is missing then display the missing-image.jpg from cache
+                                            return caches.match('./img/missing_image.jpg');
+                                        });
+                                });
+                        })
+                );
+            }
+
+            break;
+
+    }
+
+    // //https://developers.google.com/web/fundamentals/primers/service-workers
+    // //console.log('Fetch intercepted for:', e.request.url);
+    //
+    // e.respondWith(
+    //     caches.match(e.request)
+    //         .then(function(response) {
+    //             // Cache hit - return response
+    //             if (response) {
+    //                 return response;
+    //             }
+    //
+    //             return fetch(e.request).then(
+    //                 function(response) {
+    //                     // Check if we received a valid response
+    //                     if(!response || response.status !== 200 || response.type !== 'basic') {
+    //                         return response;
+    //                     }
+    //
+    //                     // IMPORTANT: Clone the response. A response is a stream
+    //                     // and because we want the browser to consume the response
+    //                     // as well as the cache consuming the response, we need
+    //                     // to clone it so we have two streams.
+    //                     var responseToCache = response.clone();
+    //
+    //                     caches.open(cache_Name)
+    //                         .then(function(cache) {
+    //                             cache.put(e.request, responseToCache);
+    //                         });
+    //
+    //                     return response;
+    //                 }
+    //             );
+    //         })
+    // );
+
 
 
 });

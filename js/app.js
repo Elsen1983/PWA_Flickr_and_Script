@@ -8,90 +8,13 @@ window.addEventListener("load", init);
 window.addEventListener('resize', resizePage);
 
 function init() {
+    onloadFunction();
+    checkNetwork();
+    // loadFromStorage();
 
-    loadFromStorage();
-
-    //check that the button_Nav is exists or not --> index.html or search2.html
-    //index.html --> Flickr search
-    if (typeof (document.getElementById("buttons_Nav")) != 'undefined' && document.getElementById("buttons_Nav") != null) {
-
-        onloadFunction();
-
-        for (let i = 0; i < searchTerms.length; i++) {
-            let newB = document.createElement("li");
-            newB.setAttribute("class", "buttons");
-            let newT = document.createTextNode(searchTerms[i]);
-            newB.appendChild(newT);
-            //add buttons to the 'sidebar'
-            document.getElementById("buttons_Nav").appendChild(newB);
-            //add event listeners to the buttons
-            newB.addEventListener("click", function () {
-                console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
-                //if app is not online --> offline, so load the last loaded images to the screen
-                if (!navigator.onLine) {
-                    console.log("App is offline, so add last loaded images to the page");
-
-                }
-                //app is online
-                else {
-                    getImages(searchTerms[i]);
-                }
-            });
-        }
-
-    }
-    //search2.html --> Script search
-    else {
-
-    }
 }
 
-/* ----------------------- load and check the localStorage ----------------------- */
-function loadFromStorage() {
-    console.log('%c 1 - loadFromStorage called', 'background: #222; color: #bada55');
 
-    //app is offline
-    if (!navigator.onLine) {
-
-        console.log("App is offline, so add last loaded images to the page if loaded earlier");
-
-        let last_search_terms = window.localStorage.getItem("last_search");
-        let images_LocalStorage = window.localStorage.getItem("images");
-
-        /*  check that the app used earlier or not*/
-        if (last_search_terms != null) {
-            console.log("LOCALSTORAGE is NOT empty. Used earlier.");
-            //load the last loaded images to the screen if possible
-            images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
-            showImages(images_LocalStorage);
-        } else {
-            console.log("LOCALSTORAGE is EMPTY.");
-        }
-
-
-        //get images from localstorage
-        //var images_LocalStorage = localStorage.getItem("images");
-        if (!images_LocalStorage) {
-            console.log("images not stored in localStorage earlier");
-        } else {
-            console.log("images stored in localStorage earlier");
-            images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
-            console.log(images_LocalStorage);
-
-        }
-
-    }
-    //app is online
-    else {
-        let last_search_terms = window.localStorage.getItem("last_search");
-        if (last_search_terms != null) {
-            console.log("LOCALSTORAGE is NOT empty.");
-            getImages(last_search_terms);
-        } else {
-            console.log("LOCALSTORAGE is EMPTY.");
-        }
-    }
-}
 
 /* ----------------------- Search Flickr - getImages -----------------------*/
 function getImages(searchTermText) {
@@ -140,9 +63,6 @@ function showImages(images) {
     addArrowButtons();
     console.log(images);
     console.log("%c  3 - showImages called", 'background: #222; color: #bada55');
-    if (!navigator.onLine) {
-        console.log("OFFLINE");
-    }
 
     let flickrImageArray = [];
     document.getElementById('content_div').innerHTML = "";
@@ -376,5 +296,213 @@ function addArrowButtons() {
 
         };
         document.getElementById("bottomOfContent").appendChild(scrollUpButton);
+    }
+}
+
+function checkNetwork() {
+
+    console.log('%c 1 - checkNetwork() called', 'background: #222; color: #bada55');
+
+    /*  Check that the button_Nav is exists or not --> index.html or search2.html */
+    /*  Option 1 - index.html --> Flickr search */
+    if (typeof (document.getElementById("buttons_Nav")) != 'undefined' && document.getElementById("buttons_Nav") != null) {
+        console.log("-----------------------");
+        console.log("---- Flickr Search ----");
+        console.log("-----------------------\n");
+        /* Option 1 - App is OFFLINE */
+        if (!navigator.onLine) {
+            console.log("App is OFFLINE");
+            if (checkLocalStorageUsage() === false) {
+
+                console.log("LOCALSTORAGE is NOT used earlier.");
+
+                document.getElementById('loading_txt').innerHTML = "Sorry, Can't access Flickr.";
+                document.getElementById('content_div').innerHTML = "Try again later.";
+                makeButtons("checkNetwork");
+
+            } else {
+                console.log("LOCALSTORAGE is used earlier.");
+                console.log("load images from CACHE...");
+                let x = window.caches.open("v1");
+                console.log("length" + x.length);
+
+            }
+        }
+        /* Option 2 - App is Online */
+        else {
+            console.log("App is ONLINE");
+            /*  never used before */
+            if (checkLocalStorageUsage() === false) {
+                console.log("LOCALSTORAGE is NOT used earlier.");
+                /*  generate the buttons */
+                makeButtons("searchNetwork");
+            }
+            /*  used before */
+            else{
+                console.log("LOCALSTORAGE is used earlier.");
+                console.log("load images from CACHE...");
+                /*  generate the buttons */
+                makeButtons("searchNetwork");
+                /* load images from Cache */
+
+            }
+
+        }
+    }/* Option 1.b - App is never used before or localStorage and cache are cleaned out */
+    else {
+        /*  Search SCRIPT page */
+        console.log("-----------------------");
+        console.log("---- Script Search ----");
+        console.log("-----------------------\n");
+    }
+}
+
+function checkLocalStorageUsage() {
+
+    console.log('%c 2 - checkLocalStorageUsage() called', 'background: #222; color: #bada55');
+
+    let last_search_terms = window.localStorage.getItem("last_search");
+    let images_LocalStorage = window.localStorage.getItem("images");
+
+    let used = false;
+
+    /* Option 1.a - App is used before */
+    if (last_search_terms != null && images_LocalStorage != null) {
+        used = true;
+        return used;
+        //load the last loaded images to the screen if possible
+        // images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
+        // showImages(images_LocalStorage);
+    }
+    /* Option 1.b - App is never used before or localStorage and cache are cleaned out */
+    else {
+
+        return used;
+    }
+
+
+    //get images from localstorage
+    //var images_LocalStorage = localStorage.getItem("images");
+    // if (!images_LocalStorage) {
+    //     console.log("images not stored in localStorage earlier");
+    //     /* indicate that app is offline and never used before */
+    // } else {
+    //     console.log("images stored in localStorage earlier");
+    //     /* load images from localStorage */
+    //     images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
+    //     console.log(images_LocalStorage);
+    //
+    // }
+}
+
+function makeButtons(type) {
+
+    /*  remove the buttons generated before */
+    let buttonsForRemove = document.getElementById("buttons_Nav");
+    buttonsForRemove.innerHTML = '';
+
+    for (let i = 0; i < searchTerms.length; i++) {
+        let newB = document.createElement("li");
+        newB.setAttribute("class", "buttons");
+        let newT = document.createTextNode(searchTerms[i]);
+        newB.appendChild(newT);
+        /*  add buttons to the 'sidebar' */
+        document.getElementById("buttons_Nav").appendChild(newB);
+        /*  add event listeners to the buttons */
+        newB.addEventListener("click", function () {
+
+            if (type === "checkNetwork") {
+                console.log("button pressed -> check Network because app offline");
+                checkNetwork();
+            }
+
+            if(type === "searchNetwork"){
+                console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
+                /*  add selected term into searchTerms */
+                getImages(searchTerms[i]);
+            }
+
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ----------------------- load and check the localStorage ----------------------- */
+function loadFromStorage(btnInfo) {
+
+
+    /* Option 1 - App is OFFLINE */
+    if (!navigator.onLine) {
+
+        console.log("App is offline, so try to add last loaded images to the page if possible");
+
+        /* Option 1.a - App is used before */
+        if (last_search_terms != null) {
+            console.log("LOCALSTORAGE is used earlier.");
+            //load the last loaded images to the screen if possible
+            images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
+            showImages(images_LocalStorage);
+        }
+        /* Option 1.b - App is never used before or localStorage and cache are cleaned out */
+        else {
+            console.log("LOCALSTORAGE is NOT used earlier.");
+        }
+
+
+        //get images from localstorage
+        //var images_LocalStorage = localStorage.getItem("images");
+        if (!images_LocalStorage) {
+            console.log("images not stored in localStorage earlier");
+            /* indicate that app is offline and never used before */
+        } else {
+            console.log("images stored in localStorage earlier");
+            /* load images from localStorage */
+            images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
+            console.log(images_LocalStorage);
+
+        }
+
+    }
+    /* Option 2 - App is ONLINE */
+    else {
+        console.log("App is online, so try to add last loaded images to the page if possible or load from network");
+        /*  Option 2.a - Found earlier search term and images in localStorage */
+        if (last_search_terms != null && images_LocalStorage != null) {
+            console.log("LOCALSTORAGE is NOT empty.");
+            /* try to load images first from cache */
+            // if(images_LocalStorage != null){
+            //     console.log("Load images from Cache.");
+            getImages(last_search_terms);
+            // }
+            // else{
+            //     console.log("Load images from network.");
+            //     //getImages(last_search_terms);
+            // }
+
+        }
+        /*  Option 2.a - Didn't find earlier search term and images in localStorage */
+        else {
+            console.log("LOCALSTORAGE is EMPTY.");
+            console.log("Load images from network.");
+            //getImages(last_search_terms);
+        }
     }
 }
