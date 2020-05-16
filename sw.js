@@ -36,17 +36,10 @@ const mutable_cache_Files = [
 /*
     Cache on installation / for every consequent request you should check the cache first, then the network if it
     wasn't in the cache (if found online then add it to the cache).
+    Call it when the installation phase starts.
  */
 self.addEventListener('install', function (e) {
     log(' Installing');
-    /*  The install event must wait until the promise within this is actually going to be resolved */
-    // e.waitUntil(
-    //     caches.open(cache_Name)
-    //         .then(cache => {
-    //             return cache.addAll(mutable_cache_Files);
-    //         })
-    // );
-
 
     e.waitUntil(
         /* Open 'cache_Name' from the caches */
@@ -89,6 +82,7 @@ self.addEventListener('install', function (e) {
 
 
 /* ----------------------- 2 - Call 'activate' event for the service worker ----------------------- */
+/*  Call it when the activation phase starts. */
 self.addEventListener('activate', function (e) {
     log(' Activating');
     /*  Wait until the following is done and only declare the service worker activated
@@ -118,12 +112,19 @@ self.addEventListener('activate', function (e) {
 
 
 /* ----------------------- 3 - Call 'fetch' event for the service worker ----------------------- */
+/*  This is fired whenever the web page requests some resource. This
+    can be embedded media (e.g. <img> tags in the HTML), clicking on links,
+    JavaScript code (E.g XMLHttpRequest objects, JSON-P, Fetch, etc), and so on.
+    So, the fetch event handler is called every time your web pages requests a
+    resource over the internet. */
 self.addEventListener('fetch', function (e) {
 
     console.log("REQUEST TYPE - " + e.request.method);
+
     /* if not a GET request */
     if (e.request.method !== 'GET') {
-        log(" POST or PUT request!")
+        log(' fetch event ignored.', e.request.method, e.request.url);
+        return;
     }
 
     // Parse the URL
@@ -136,13 +137,66 @@ self.addEventListener('fetch', function (e) {
         case "webdevcit.com" || "localhost":
             log(' Fetching local request');
             console.log(requestURL);
+            if (/movieObj.js/.test(requestURL.href)) {
+                //skip caching local JSON file(s)
+                //check network first and if not find then send back fallback content indicating the app is offline
+                let fetchedP = fetch(e.request);
+                return fetchedP
+                    .then(function (resp) {
+                        return resp
+                    })
+                    .catch(function () {
+                        return new Response(
+                            "<h1>Offline</h1>",
+                            {headers: {"Content-Type": "text/html"}}
+                        );
+                    });
+            }
+            //if not JSON request
+            else {
+                e.respondWith(
+                    caches.open(cache_Name).then(function (cache) {
+                        return cache.match(e.request).then(function (response) {
+                            return response || fetch(e.request).then(function (response) {
+                                cache.put(e.request, response.clone());
+                                return response;
+                            });
+                        });
+                    })
+                );
+            }
+
             break;
 
         /* Flickr Image requests */
         /* Check Cache first, Then Network (and cache the response) */
         case "farm66.static.flickr.com":
             log(' Fetching Flickr Image requests');
-            console.log(requestURL);
+            console.log('Fetch intercepted for:', requestURL);
+
+            // I know we looking for 'jpg' files only but added 'gif' too here
+            if (/\.(jpg|JPG|gif|GIF)$/.test(requestURL.href)) {
+                // console.log("---- Flickr IMAGE request detected ----");
+                e.respondWith(
+                    caches.open(cache_Name)
+                        .then(function (cache) {
+                            return cache.match(e.request)
+                                .then(response => {
+                                    return response || fetch(e.request)
+                                        .then(response => {
+                                            console.log("Image is not in the cache, so caching it.");
+                                            cache.put(e.request, response.clone());
+                                            return response;
+                                        })
+                                        .catch(function () {
+                                            //if image is missing then display the missing-image.jpg from cache
+                                            return caches.match('./img/missing_image.jpg');
+                                        });
+                                });
+                        })
+                );
+            }
+
             break;
 
         //Flickr JSON request
@@ -192,12 +246,54 @@ self.addEventListener('fetch', function (e) {
     // );
 
 
-
 });
 
-/* ----------------------- 4 - Functions ----------------------- */
+/*  ----------------------- 4 - Functions -----------------------   */
 
 /*  Each logging line will be prepended with the service worker version */
 function log(message) {
     console.log("%c [ServiceWorker - '" + cache_Name + "]", 'background: #FFFFFF; color: #329011', message);
 }
+
+
+/*  ----------------------- 5 - Extra Information -----------------------  */
+
+/*  REQUEST
+    Request objects represents the URL of some resource. Many of the methods requiring a Request object
+    as a parameter will accept the URL as a string (they will create the Request object from it).
+    These objects can identify resources online or in the cache.    */
+
+/*  RESPONSE
+    Response objects represent the data/resource that come back from a request (they can come
+    from the network or the cache)  */
+
+
+/*  waitUntil()
+    We can use the waitUntil() event method to make sure the service worker knows the process is still underway.
+    This is a method of the Event object that is passed to the event handler. It is passed a Promise and won't
+    terminate until the Promise is resolved/rejected. (The Promise should resolve when the asynchronous code
+    of the event handler is finished.)   */
+
+/*  respondWith()
+    Call the event.respondWith() method to pass a Response object back to the window or tab that made the request.  */
+
+/*  fetch()
+    The fetch() returns a Promise that resolves to a Response object for the request.
+    I.e. it will try and load the file from the internet and create a Response object with what is returned.    */
+
+/*  cache.open()
+    This method returns a promise that resolves to a Cache object.  */
+
+
+/*  ----------------------- 6 - Example codes   ----------------------- */
+
+/*  Deleting a files in the /images/ folder from the example-cache cache.
+
+    caches.open('example-cache').then(function(cache) {
+        cache.matchAll('/images/').then(function(response) {
+            response.forEach(function(element, index, array) {
+                cache.delete(element);
+            });
+        });
+    })
+ */

@@ -1,7 +1,8 @@
 /* ----------------------- Declare the variables ----------------------- */
 const searchTerms = ["Ivan Aivazovsky", "Henry Pether", "Robin Jacques"];
 var images_Array = [];
-let buttons = document.getElementsByClassName("buttons");
+var buttons = document.getElementsByClassName("buttons");
+var flickrImageArray = [];
 
 /* ----------------------- Setup the page ----------------------- */
 window.addEventListener("load", init);
@@ -9,11 +10,10 @@ window.addEventListener('resize', resizePage);
 
 function init() {
     onloadFunction();
-    checkNetwork();
+    checkNetworkOnLoad();
     // loadFromStorage();
 
 }
-
 
 
 /* ----------------------- Search Flickr - getImages -----------------------*/
@@ -49,28 +49,27 @@ function getImages(searchTermText) {
     let scriptTag = document.createElement("script");
     scriptTag.setAttribute("src", full);
     scriptTag.setAttribute("type", "application/javascript");
+
     let bodyZero = document.querySelectorAll("body")[0];
-    // fetch(scriptTag.src).then(function (response) {
-    //     console.log(response);
-    //
-    // })
+
     bodyZero.appendChild(scriptTag);
+
     disableButtons();
 }
 
 /* -------------------Handle FlickrSearch Results ------------------*/
 function showImages(images) {
-    addArrowButtons();
     console.log(images);
     console.log("%c  3 - showImages called", 'background: #222; color: #bada55');
 
-    let flickrImageArray = [];
     document.getElementById('content_div').innerHTML = "";
+
     if (images.stat === 'fail') {
         document.getElementById('content_div').innerHTML = "Error";
         enableButtons();
     } else {
-        /* clear the images array, because we want to store just the last searchTerm + images in the localStorage*/
+        /* clear the image-arrays, because we want to store just the last searchTerm + images in the localStorage*/
+        flickrImageArray.length = 0;
         images_Array.length = 0;
 
         let targetnr = images.photos.photo.length;
@@ -83,27 +82,26 @@ function showImages(images) {
                 let imgName = "/";
                 let title = images.photos.photo[i].title;
 
-                //if(caches.match())
-
                 url += ".static.flickr.com";
 
                 imgName += images.photos.photo[i].server + "/";
                 imgName += images.photos.photo[i].id + "_";
                 imgName += images.photos.photo[i].secret;
+
                 let big_Url = url + imgName + ".jpg";
-                // console.log("Image: " + imgName + ".jpg");
                 let image_name_extension = imgName + ".jpg";
 
-                /*  Add the current images into the 'images_Array' with name+extension */
-                images_Array.push(image_name_extension);
+                /*  Add the current image Object into the 'images_Array' with name+extension */
+                images_Array.push(new FlickrImage(big_Url, title, image_name_extension));
 
                 //clear the images in localStorage
                 removeItemFromLocalStorage("images");
                 //add current images into localStorage
                 addItemToLocalStorage("images", JSON.stringify(images_Array));
 
-                //??need here to check the net connection is ready or not
                 flickrImageArray.push(new FlickrImage(big_Url, title, image_name_extension));
+
+
             }
             createImages(flickrImageArray);
 
@@ -120,8 +118,6 @@ function FlickrImage(image_URL, image_Title, image_NameAndExtension) {
 }
 
 FlickrImage.prototype.getImageObject = function () {
-    console.log("FlickrImage.prototype.getImageObject called");
-    //console.log("return promises: " + this.imageSRC);
 
     return new Promise((resolve, reject) => {
         // Create an image object
@@ -172,6 +168,7 @@ function imageTitleOnModal(getTitle) {
 /* ------------------------ Place Images on the Page ------------ */
 function createImages(flickr_array) {
     console.log("createImages called");
+    console.log(flickr_array);
     let promiseArray = [];
 
     for (let i = 0; i < flickr_array.length; i++) {
@@ -249,12 +246,25 @@ function onloadFunction() {
 
 function resizePage() {
     let x = document.getElementById("product_inner_container");
+    var buttons = document.getElementsByClassName("buttons");
+
     if (window.innerWidth === 479 || window.innerWidth < 479) {
         x.style.display = "none";
     }
     if (window.innerWidth > 479) {
         x.style.display = "flex";
     }
+
+    // if(window.innerWidth === 1024 || window.innerWidth > 1024){
+    //     for (let i = 0; i < buttons.length; i++) {
+    //         buttons[i].style.color = "black";
+    //     }
+    // }
+    // else{
+    //     for (let i = 0; i < buttons.length; i++) {
+    //         buttons[i].style.color = "white";
+    //     }
+    // }
 }
 
 function removeItemFromLocalStorage(key) {
@@ -299,7 +309,7 @@ function addArrowButtons() {
     }
 }
 
-function checkNetwork() {
+function checkNetworkOnLoad() {
 
     console.log('%c 1 - checkNetwork() called', 'background: #222; color: #bada55');
 
@@ -309,41 +319,73 @@ function checkNetwork() {
         console.log("-----------------------");
         console.log("---- Flickr Search ----");
         console.log("-----------------------\n");
+
+        let last_search_term = window.localStorage.getItem("last_search");
+        let images_LocalStorage = window.localStorage.getItem("images");
+
         /* Option 1 - App is OFFLINE */
         if (!navigator.onLine) {
             console.log("App is OFFLINE");
-            if (checkLocalStorageUsage() === false) {
+
+            /*  Highlight the app is offline at the moment */
+            if (typeof (document.getElementById("serverStatus")) != 'undefined' && document.getElementById("serverStatus") != null) {
+            }
+            else{
+                let status = document.createElement("p");
+                status.setAttribute("id", "serverStatus");
+                let newT = document.createTextNode("The application is currently OFFLINE...");
+                status.appendChild(newT);
+                status.style.textAlign = "center";
+                document.getElementById("topOfContent").appendChild(status);
+            }
+
+            if (checkLocalStorageUsage(last_search_term, images_LocalStorage) === false) {
 
                 console.log("LOCALSTORAGE is NOT used earlier.");
 
                 document.getElementById('loading_txt').innerHTML = "Sorry, Can't access Flickr.";
                 document.getElementById('content_div').innerHTML = "Try again later.";
-                makeButtons("checkNetwork");
+                makeButtons("checkNetwork", last_search_term);
 
             } else {
                 console.log("LOCALSTORAGE is used earlier.");
+                makeButtons("checkNetwork", last_search_term);
                 console.log("load images from CACHE...");
-                let x = window.caches.open("v1");
-                console.log("length" + x.length);
+                loadImagesFromCache(images_LocalStorage);
+                addArrowButtons();
 
             }
         }
         /* Option 2 - App is Online */
         else {
             console.log("App is ONLINE");
+
+            if (typeof (document.getElementById("serverStatus")) != 'undefined' && document.getElementById("serverStatus") != null) {
+                document.getElementById("topOfContent").innerHTML = "";
+            }
+
             /*  never used before */
-            if (checkLocalStorageUsage() === false) {
+            if (checkLocalStorageUsage(last_search_term, images_LocalStorage) === false) {
                 console.log("LOCALSTORAGE is NOT used earlier.");
                 /*  generate the buttons */
-                makeButtons("searchNetwork");
+                makeButtons("searchNetwork", last_search_term);
             }
             /*  used before */
-            else{
+            else {
                 console.log("LOCALSTORAGE is used earlier.");
-                console.log("load images from CACHE...");
                 /*  generate the buttons */
-                makeButtons("searchNetwork");
+                makeButtons("searchNetwork", last_search_term);
                 /* load images from Cache */
+                console.log("load images from CACHE...");
+                loadImagesFromCache(images_LocalStorage);
+
+                /*FINISHED here 16th of May*/
+
+                addArrowButtons();
+                //getImages(last_search_term);
+
+
+                // loadImagesFromCache();
 
             }
 
@@ -357,55 +399,41 @@ function checkNetwork() {
     }
 }
 
-function checkLocalStorageUsage() {
+function checkLocalStorageUsage(lastSearchTerm, localStorageImages) {
 
     console.log('%c 2 - checkLocalStorageUsage() called', 'background: #222; color: #bada55');
 
-    let last_search_terms = window.localStorage.getItem("last_search");
-    let images_LocalStorage = window.localStorage.getItem("images");
 
     let used = false;
 
     /* Option 1.a - App is used before */
-    if (last_search_terms != null && images_LocalStorage != null) {
+    if (lastSearchTerm != null && localStorageImages != null) {
         used = true;
         return used;
-        //load the last loaded images to the screen if possible
-        // images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
-        // showImages(images_LocalStorage);
     }
     /* Option 1.b - App is never used before or localStorage and cache are cleaned out */
     else {
-
         return used;
     }
-
-
-    //get images from localstorage
-    //var images_LocalStorage = localStorage.getItem("images");
-    // if (!images_LocalStorage) {
-    //     console.log("images not stored in localStorage earlier");
-    //     /* indicate that app is offline and never used before */
-    // } else {
-    //     console.log("images stored in localStorage earlier");
-    //     /* load images from localStorage */
-    //     images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
-    //     console.log(images_LocalStorage);
-    //
-    // }
 }
 
-function makeButtons(type) {
-
+function makeButtons(type, term) {
     /*  remove the buttons generated before */
     let buttonsForRemove = document.getElementById("buttons_Nav");
     buttonsForRemove.innerHTML = '';
 
+
     for (let i = 0; i < searchTerms.length; i++) {
         let newB = document.createElement("li");
         newB.setAttribute("class", "buttons");
+        newB.setAttribute("id", searchTerms[i]);
         let newT = document.createTextNode(searchTerms[i]);
         newB.appendChild(newT);
+
+        // if(term === searchTerms[i]){
+        //     newB.style.color = "darkorange";
+        // }
+
         /*  add buttons to the 'sidebar' */
         document.getElementById("buttons_Nav").appendChild(newB);
         /*  add event listeners to the buttons */
@@ -413,96 +441,135 @@ function makeButtons(type) {
 
             if (type === "checkNetwork") {
                 console.log("button pressed -> check Network because app offline");
-                checkNetwork();
-            }
+                /* double check the network when button clicked */
+                if(checkNetwork() === false){
+                    checkNetworkOnLoad();
+                }
+                else{
+                    getImages(searchTerms[i]);
+                }
 
-            if(type === "searchNetwork"){
+            }
+            if (type === "searchNetwork") {
                 console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
-                /*  add selected term into searchTerms */
-                getImages(searchTerms[i]);
+                /* double check the network when button clicked */
+                if(checkNetwork() === false){
+                    checkNetworkOnLoad();
+                }
+                else{
+                    /*  add selected term into searchTerms */
+                    getImages(searchTerms[i]);
+                }
             }
-
         });
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ----------------------- load and check the localStorage ----------------------- */
-function loadFromStorage(btnInfo) {
-
-
-    /* Option 1 - App is OFFLINE */
+function checkNetwork(){
+    let onlineStatus = false;
     if (!navigator.onLine) {
+        return onlineStatus;
+    }
+    else{
+        onlineStatus = true;
+        return onlineStatus;
+    }
+}
 
-        console.log("App is offline, so try to add last loaded images to the page if possible");
+function loadImagesFromCache(imagesFromLocalStorage){
+    let newImageArray = [];
+    let fromLocal = (imagesFromLocalStorage) ? JSON.parse(imagesFromLocalStorage) : [];
 
-        /* Option 1.a - App is used before */
-        if (last_search_terms != null) {
-            console.log("LOCALSTORAGE is used earlier.");
-            //load the last loaded images to the screen if possible
-            images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
-            showImages(images_LocalStorage);
+    for (let i = 0; i < fromLocal.length; i++) {
+        let element = fromLocal[i];
+        newImageArray.push(element);
+    }
+
+    let promiseArray = [];
+
+    document.getElementById('content_div').innerHTML = "";
+
+    for (let i = 0; i < fromLocal.length; i++) {
+
+        if (caches.match(newImageArray[i].imageSRC)) {
+            console.log("image is in the cache");
+
+            let divObj = document.createElement("li");
+            divObj.className = "imageTag";
+            let loader = document.createElement("img");
+            loader.src = 'img/loaderGif.gif';
+            loader.className = "loader";
+            divObj.appendChild(loader);
+
+            /*
+                * We call the loadImage function and call .then
+                * on the Promise that it returns, passing a function that we
+                * want to receive the realized Image
+                */
+            let tempPromise = loadImage(fromLocal[i].imageSRC, fromLocal[i].imageTitle);
+
+            tempPromise.then(function (resolvedImage) {
+                divObj.innerHTML = "";
+                divObj.appendChild(resolvedImage);
+            });
+            promiseArray.push(tempPromise);
+
+            document.getElementById('content_div').appendChild(divObj);
         }
-        /* Option 1.b - App is never used before or localStorage and cache are cleaned out */
-        else {
-            console.log("LOCALSTORAGE is NOT used earlier.");
-        }
 
-
-        //get images from localstorage
-        //var images_LocalStorage = localStorage.getItem("images");
-        if (!images_LocalStorage) {
-            console.log("images not stored in localStorage earlier");
-            /* indicate that app is offline and never used before */
-        } else {
-            console.log("images stored in localStorage earlier");
-            /* load images from localStorage */
-            images_LocalStorage = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
-            console.log(images_LocalStorage);
-
-        }
 
     }
-    /* Option 2 - App is ONLINE */
-    else {
-        console.log("App is online, so try to add last loaded images to the page if possible or load from network");
-        /*  Option 2.a - Found earlier search term and images in localStorage */
-        if (last_search_terms != null && images_LocalStorage != null) {
-            console.log("LOCALSTORAGE is NOT empty.");
-            /* try to load images first from cache */
-            // if(images_LocalStorage != null){
-            //     console.log("Load images from Cache.");
-            getImages(last_search_terms);
-            // }
-            // else{
-            //     console.log("Load images from network.");
-            //     //getImages(last_search_terms);
-            // }
+    Promise.all(promiseArray).then(enableButtons);
+}
 
-        }
-        /*  Option 2.a - Didn't find earlier search term and images in localStorage */
-        else {
-            console.log("LOCALSTORAGE is EMPTY.");
-            console.log("Load images from network.");
-            //getImages(last_search_terms);
-        }
-    }
+
+function loadImage(url, title) {
+    /*
+     * We are going to return a Promise which, when we .then
+     * will give us an Image that should be fully loaded
+     */
+    return new Promise( (resolve, reject) => {
+        /*
+         * Create the image that we are going to use to
+         * to hold the resource
+         */
+        const imageObject = new Image();
+
+        document.getElementById("loading_txt").style.display = "none";
+
+        /*
+         * The Image API deals in even listeners and callbacks
+         * we attach a listener for the "load" event which fires
+         * when the Image has finished the network request and
+         * populated the Image with data
+         */
+        imageObject.addEventListener('load', () => {
+
+            imageObject.onclick = () => {
+                console.log("Modal activated on clicked image :" + title);
+                imageTitleOnModal(title);
+            };
+            /*
+                You have to manually tell the Promise that you are
+                done dealing with asynchronous stuff and you are ready
+                for it to give anything that attached a callback
+                through .then a realized value.  We do that by calling
+                resolve and passing it the realized value.   */
+            resolve(imageObject)
+        });
+
+        imageObject.addEventListener("error", () => {
+            imageObject.innerHTML = "Can't Load";
+            reject();
+        });
+
+        /*
+         * Setting the Image.src is what starts the networking process
+         * to populate an image.  After you set it, the browser fires
+         * a request to get the resource.  We attached a load listener
+         * which will be called once the request finishes and we have
+         * image data
+         */
+        imageObject.src = url;
+    });
 }
