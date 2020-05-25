@@ -329,25 +329,21 @@ function checkNetworkOnLoad() {
 
             /*  Highlight the app is offline at the moment */
             if (typeof (document.getElementById("serverStatus")) != 'undefined' && document.getElementById("serverStatus") != null) {
-            }
-            else{
-                let status = document.createElement("p");
-                status.setAttribute("id", "serverStatus");
-                let newT = document.createTextNode("The application is currently OFFLINE...");
-                status.appendChild(newT);
-                status.style.textAlign = "center";
-                document.getElementById("topOfContent").appendChild(status);
+
+            } else {
+                addOfflineStatus("topOfContent");
             }
 
+            /*  Option 1.a - LOCALSTORAGE is NOT used earlier.  */
             if (checkLocalStorageUsage(last_search_term, images_LocalStorage) === false) {
-
                 console.log("LOCALSTORAGE is NOT used earlier.");
-
                 document.getElementById('loading_txt').innerHTML = "Sorry, Can't access Flickr.";
                 document.getElementById('content_div').innerHTML = "Try again later.";
                 makeButtons("checkNetwork", last_search_term);
 
-            } else {
+            }
+            /*  Option 1.b - LOCALSTORAGE is used earlier.  */
+            else {
                 console.log("LOCALSTORAGE is used earlier.");
                 makeButtons("checkNetwork", last_search_term);
                 console.log("load images from CACHE...");
@@ -364,18 +360,18 @@ function checkNetworkOnLoad() {
                 document.getElementById("topOfContent").innerHTML = "";
             }
 
-            /*  never used before */
+            /*  Option 2.a - LOCALSTORAGE is NOT used earlier.  */
             if (checkLocalStorageUsage(last_search_term, images_LocalStorage) === false) {
                 console.log("LOCALSTORAGE is NOT used earlier.");
-                /*  generate the buttons */
+                /*  create the buttons */
                 makeButtons("searchNetwork", last_search_term);
             }
-            /*  used before */
+            /*  Option 1.a - LOCALSTORAGE is used earlier.  */
             else {
                 console.log("LOCALSTORAGE is used earlier.");
-                /*  generate the buttons */
+                /*  create the buttons */
                 makeButtons("searchNetwork", last_search_term);
-                /* load images from Cache */
+                /*  load images from Cache */
                 console.log("load images from CACHE...");
                 loadImagesFromCache(images_LocalStorage);
 
@@ -430,9 +426,6 @@ function makeButtons(type, term) {
         let newT = document.createTextNode(searchTerms[i]);
         newB.appendChild(newT);
 
-        // if(term === searchTerms[i]){
-        //     newB.style.color = "darkorange";
-        // }
 
         /*  add buttons to the 'sidebar' */
         document.getElementById("buttons_Nav").appendChild(newB);
@@ -442,10 +435,9 @@ function makeButtons(type, term) {
             if (type === "checkNetwork") {
                 console.log("button pressed -> check Network because app offline");
                 /* double check the network when button clicked */
-                if(checkNetwork() === false){
+                if (checkNetwork() === false) {
                     checkNetworkOnLoad();
-                }
-                else{
+                } else {
                     getImages(searchTerms[i]);
                 }
 
@@ -453,10 +445,9 @@ function makeButtons(type, term) {
             if (type === "searchNetwork") {
                 console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
                 /* double check the network when button clicked */
-                if(checkNetwork() === false){
+                if (checkNetwork() === false) {
                     checkNetworkOnLoad();
-                }
-                else{
+                } else {
                     /*  add selected term into searchTerms */
                     getImages(searchTerms[i]);
                 }
@@ -465,18 +456,39 @@ function makeButtons(type, term) {
     }
 }
 
-function checkNetwork(){
+function checkNetwork() {
     let onlineStatus = false;
     if (!navigator.onLine) {
+        if (document.getElementById("serverStatus") == null) {
+            addOfflineStatus("topOfContent");
+        }
         return onlineStatus;
-    }
-    else{
+    } else {
+        /*  App is changed to online, so remove the "Offline text"    */
+        removeOnlineStatus("serverStatus");
         onlineStatus = true;
         return onlineStatus;
     }
 }
 
-function loadImagesFromCache(imagesFromLocalStorage){
+function addOfflineStatus(parent) {
+    let status = document.createElement("p");
+    status.setAttribute("id", "serverStatus");
+    let newT = document.createTextNode("The application is currently OFFLINE...");
+    status.appendChild(newT);
+    status.style.textAlign = "center";
+    document.getElementById(parent).appendChild(status);
+}
+
+function removeOnlineStatus(element) {
+    // Removes an element from the document
+    let serverStatus = document.getElementById(element);
+    if (serverStatus != null) {
+        serverStatus.remove();
+    }
+}
+
+function loadImagesFromCache(imagesFromLocalStorage) {
     let newImageArray = [];
     let fromLocal = (imagesFromLocalStorage) ? JSON.parse(imagesFromLocalStorage) : [];
 
@@ -528,7 +540,7 @@ function loadImage(url, title) {
      * We are going to return a Promise which, when we .then
      * will give us an Image that should be fully loaded
      */
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         /*
          * Create the image that we are going to use to
          * to hold the resource
