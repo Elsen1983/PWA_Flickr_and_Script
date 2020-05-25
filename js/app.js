@@ -16,10 +16,10 @@ function init() {
 }
 
 
-/* ----------------------- Search Flickr - getImages -----------------------*/
+/*  ----------------------- Search Flickr - getImages -----------------------    */
 function getImages(searchTermText) {
 
-    console.log('%c  2 - getImage() called with ' + searchTermText, 'background: #222; color: #bada55');
+    console.log('%c getImages() called with ' + searchTermText, 'background: #222; color: #bada55');
 
     window.localStorage.setItem('last_search', searchTermText);
 
@@ -57,10 +57,11 @@ function getImages(searchTermText) {
     disableButtons();
 }
 
-/* -------------------Handle FlickrSearch Results ------------------*/
+/*  -------------------Handle FlickrSearch Results ------------------    */
 function showImages(images) {
+
+    console.log("%c showImages() called", 'background: #222; color: #bada55');
     console.log(images);
-    console.log("%c  3 - showImages called", 'background: #222; color: #bada55');
 
     document.getElementById('content_div').innerHTML = "";
 
@@ -77,6 +78,10 @@ function showImages(images) {
             document.getElementById('content_div').innerHTML = "No Results";
             enableButtons();
         } else {
+            /*  Clear the images in localStorage    */
+            console.log('%c removeItemFromLocalStorage() called', 'background: #FFDEAD; color: #000000');
+            removeItemFromLocalStorage("images");
+
             for (let i = 0; i < images.photos.photo.length; i++) {
                 let url = "https://farm" + images.photos.photo[i].farm;
                 let imgName = "/";
@@ -94,24 +99,22 @@ function showImages(images) {
                 /*  Add the current image Object into the 'images_Array' with name+extension */
                 images_Array.push(new FlickrImage(big_Url, title, image_name_extension));
 
-                //clear the images in localStorage
-                removeItemFromLocalStorage("images");
-                //add current images into localStorage
-                addItemToLocalStorage("images", JSON.stringify(images_Array));
-
                 flickrImageArray.push(new FlickrImage(big_Url, title, image_name_extension));
-
-
             }
+
+            /*  Add current images into localStorage    */
+            console.log('%c addItemToLocalStorage() called', 'background: #FFDEAD; color: #000000');
+            addItemToLocalStorage("images", JSON.stringify(images_Array));
+
             createImages(flickrImageArray);
 
         }
     }
 }
 
-/* - Constructor for FlickrImages object*/
+/*  Constructor for FlickrImages object    */
 function FlickrImage(image_URL, image_Title, image_NameAndExtension) {
-    console.log("FlickrImage constructor called");
+    // console.log("FlickrImage constructor called");
     this.imageSRC = image_URL;
     this.imageTitle = image_Title;
     this.imageName = image_NameAndExtension;
@@ -167,7 +170,7 @@ function imageTitleOnModal(getTitle) {
 
 /* ------------------------ Place Images on the Page ------------ */
 function createImages(flickr_array) {
-    console.log("createImages called");
+    console.log("%c createImages() called", 'background: #222; color: #bada55');
     console.log(flickr_array);
     let promiseArray = [];
 
@@ -202,6 +205,7 @@ function createImages(flickr_array) {
     // a certain time has elapsed
 }
 
+
 /* ----------------- Enable and Display search buttons ----------- */
 function enableButtons() {
     for (let i = 0; i < buttons.length; i++) {
@@ -222,7 +226,7 @@ function disableButtons() {
 
 /* ----------------------- Functions for the basic site functionalities (e.g. hide buttons) */
 
-//Show-hide menu for btn
+/*  Show-hide menu for btn. */
 function hide_Menu() {
     const x = document.getElementById("product_inner_container");
     // console.log(x.style.display);
@@ -233,8 +237,7 @@ function hide_Menu() {
     }
 }
 
-//hide some element from the DOM
-//must use it because JS not reading the CSS style on onload (just inline style)
+/*  Hide some element from the DOM. Must use it because JS not reading the CSS style on onload (just inline style). */
 function onloadFunction() {
     const x = document.getElementById("product_inner_container");
     if (window.innerWidth > 479) {
@@ -254,17 +257,6 @@ function resizePage() {
     if (window.innerWidth > 479) {
         x.style.display = "flex";
     }
-
-    // if(window.innerWidth === 1024 || window.innerWidth > 1024){
-    //     for (let i = 0; i < buttons.length; i++) {
-    //         buttons[i].style.color = "black";
-    //     }
-    // }
-    // else{
-    //     for (let i = 0; i < buttons.length; i++) {
-    //         buttons[i].style.color = "white";
-    //     }
-    // }
 }
 
 function removeItemFromLocalStorage(key) {
@@ -276,7 +268,7 @@ function addItemToLocalStorage(key, value) {
 }
 
 function addArrowButtons() {
-    //scroll down button
+    /*  Scroll down button  */
     if (!document.getElementById("scrollDown")) {
         let scrollDownButton = document.createElement("i");
         scrollDownButton.className = "arrow down";
@@ -288,7 +280,7 @@ function addArrowButtons() {
         };
         document.getElementById("topOfContent").appendChild(scrollDownButton);
     }
-    //scroll up button
+    /*  Scroll up button  */
     if (!document.getElementById("scrollUp")) {
         let scrollUpButton = document.createElement("i");
         scrollUpButton.className = "arrow up";
@@ -303,7 +295,6 @@ function addArrowButtons() {
                 firstElement.scrollIntoView();
                 firstElement.focus();
             }
-
         };
         document.getElementById("bottomOfContent").appendChild(scrollUpButton);
     }
@@ -311,10 +302,10 @@ function addArrowButtons() {
 
 function checkNetworkOnLoad() {
 
-    console.log('%c 1 - checkNetwork() called', 'background: #222; color: #bada55');
+    console.log('%c checkNetwork() called', 'background: #222; color: #bada55');
 
     /*  Check that the button_Nav is exists or not --> index.html or search2.html */
-    /*  Option 1 - index.html --> Flickr search */
+    /*  Option A - index.html --> Flickr search */
     if (typeof (document.getElementById("buttons_Nav")) != 'undefined' && document.getElementById("buttons_Nav") != null) {
         console.log("-----------------------");
         console.log("---- Flickr Search ----");
@@ -345,10 +336,10 @@ function checkNetworkOnLoad() {
             /*  Option 1.b - LOCALSTORAGE is used earlier.  */
             else {
                 console.log("LOCALSTORAGE is used earlier.");
-                makeButtons("checkNetwork", last_search_term);
                 console.log("load images from CACHE...");
                 loadImagesFromCache(images_LocalStorage);
                 addArrowButtons();
+                makeButtons("checkNetwork", last_search_term);
 
             }
         }
@@ -357,7 +348,7 @@ function checkNetworkOnLoad() {
             console.log("App is ONLINE");
 
             if (typeof (document.getElementById("serverStatus")) != 'undefined' && document.getElementById("serverStatus") != null) {
-                document.getElementById("topOfContent").innerHTML = "";
+               // document.getElementById("topOfContent").innerHTML = "";
             }
 
             /*  Option 2.a - LOCALSTORAGE is NOT used earlier.  */
@@ -366,7 +357,7 @@ function checkNetworkOnLoad() {
                 /*  create the buttons */
                 makeButtons("searchNetwork", last_search_term);
             }
-            /*  Option 1.a - LOCALSTORAGE is used earlier.  */
+            /*  Option 2.b - LOCALSTORAGE is used earlier.  */
             else {
                 console.log("LOCALSTORAGE is used earlier.");
                 /*  create the buttons */
@@ -386,9 +377,9 @@ function checkNetworkOnLoad() {
             }
 
         }
-    }/* Option 1.b - App is never used before or localStorage and cache are cleaned out */
+    }
+    /*  Option B - search2.html --> Search SCRIPT */
     else {
-        /*  Search SCRIPT page */
         console.log("-----------------------");
         console.log("---- Script Search ----");
         console.log("-----------------------\n");
@@ -397,8 +388,7 @@ function checkNetworkOnLoad() {
 
 function checkLocalStorageUsage(lastSearchTerm, localStorageImages) {
 
-    console.log('%c 2 - checkLocalStorageUsage() called', 'background: #222; color: #bada55');
-
+    console.log('%c checkLocalStorageUsage() called', 'background: #222; color: #bada55');
 
     let used = false;
 
@@ -481,14 +471,17 @@ function addOfflineStatus(parent) {
 }
 
 function removeOnlineStatus(element) {
-    // Removes an element from the document
-    let serverStatus = document.getElementById(element);
-    if (serverStatus != null) {
-        serverStatus.remove();
+    /*  Removes an element (serverStatus)from the document    */
+    let elem = document.getElementById(element);
+    if (elem != null) {
+        elem.remove();
     }
 }
 
 function loadImagesFromCache(imagesFromLocalStorage) {
+
+    console.log('%c loadImagesFromCache() called', 'background: #222; color: #bada55');
+
     let newImageArray = [];
     let fromLocal = (imagesFromLocalStorage) ? JSON.parse(imagesFromLocalStorage) : [];
 
@@ -534,39 +527,27 @@ function loadImagesFromCache(imagesFromLocalStorage) {
     Promise.all(promiseArray).then(enableButtons);
 }
 
-
 function loadImage(url, title) {
-    /*
-     * We are going to return a Promise which, when we .then
-     * will give us an Image that should be fully loaded
-     */
+
+    console.log('%c loadImage() called', 'background: #222; color: #bada55');
+    /*  We are going to return a Promise which, when we .then will give us an Image that should be fully loaded. */
     return new Promise((resolve, reject) => {
-        /*
-         * Create the image that we are going to use to
-         * to hold the resource
-         */
+        /*  Create the image that we are going to use to hold the resource.  */
         const imageObject = new Image();
 
         document.getElementById("loading_txt").style.display = "none";
 
-        /*
-         * The Image API deals in even listeners and callbacks
-         * we attach a listener for the "load" event which fires
-         * when the Image has finished the network request and
-         * populated the Image with data
-         */
+        /*  The Image API deals in even listeners and callbacks we attach a listener for the "load" event which fires
+            when the Image has finished the network request and populated the Image with data.  */
         imageObject.addEventListener('load', () => {
 
             imageObject.onclick = () => {
                 console.log("Modal activated on clicked image :" + title);
                 imageTitleOnModal(title);
             };
-            /*
-                You have to manually tell the Promise that you are
-                done dealing with asynchronous stuff and you are ready
-                for it to give anything that attached a callback
-                through .then a realized value.  We do that by calling
-                resolve and passing it the realized value.   */
+            /*  You have to manually tell the Promise that you are done dealing with asynchronous stuff and
+                you are ready for it to give anything that attached a callback through .then() a realized value.
+                We do that by calling resolve and passing it the realized value.   */
             resolve(imageObject)
         });
 
@@ -575,13 +556,9 @@ function loadImage(url, title) {
             reject();
         });
 
-        /*
-         * Setting the Image.src is what starts the networking process
-         * to populate an image.  After you set it, the browser fires
-         * a request to get the resource.  We attached a load listener
-         * which will be called once the request finishes and we have
-         * image data
-         */
+        /*  Setting the Image.src is what starts the networking process to populate an image.  After you set it,
+            the browser fires a request to get the resource.  We attached a load listener which will be called once
+            the request finishes and we have image data.    */
         imageObject.src = url;
     });
 }

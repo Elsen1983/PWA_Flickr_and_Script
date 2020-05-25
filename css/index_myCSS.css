@@ -250,7 +250,7 @@ button {
   grid-area: e;
   bottom: 0;
   z-index: 10;
-  background-color: #fff;
+  background-color: rgba(224, 224, 224, 0.58);
   font-size: 1em
 }
 

@@ -1,12 +1,12 @@
-//importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js');
+/*  importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js'); */
 
-//workbox.googleAnalytics.initialize();
+/*  workbox.googleAnalytics.initialize(); */
 
-/*  Current version of the cache */
+/*  Current version of the cache.   */
 const cache_Name = 'v1';
 
 /*  The 'immutable_cache_Files' contains URLs that we know never change. These can safely be copied from cache to cache.
-    files that never change. Copy them directly to the new cache. */
+    files that never change. Copy them directly to the new cache.   */
 const immutable_cache_Files = [
     "./js/main.js",
     "./js/plugins.js",
@@ -32,12 +32,9 @@ const mutable_cache_Files = [
 
 ];
 
-/* ----------------------- 1 - Call 'install' event for the service worker ----------------------- */
-/*
-    Cache on installation / for every consequent request you should check the cache first, then the network if it
-    wasn't in the cache (if found online then add it to the cache).
-    Call it when the installation phase starts.
- */
+/*  ----------------------- 1 - Call 'install' event for the service worker ----------------------- */
+/*  Cache on installation / for every consequent request you should check the cache first, then the network if it
+    wasn't in the cache (if found online then add it to the cache). Call it when the installation phase starts. */
 self.addEventListener('install', function (e) {
     log(' Installing');
 
@@ -81,8 +78,8 @@ self.addEventListener('install', function (e) {
 });
 
 
-/* ----------------------- 2 - Call 'activate' event for the service worker ----------------------- */
-/*  Call it when the activation phase starts. */
+/*  ----------------------- 2 - Call 'activate' event for the service worker -----------------------    */
+/*  Call it when the activation phase starts.   */
 self.addEventListener('activate', function (e) {
     log(' Activating');
     /*  Wait until the following is done and only declare the service worker activated
@@ -111,35 +108,33 @@ self.addEventListener('activate', function (e) {
 });
 
 
-/* ----------------------- 3 - Call 'fetch' event for the service worker ----------------------- */
-/*  This is fired whenever the web page requests some resource. This
-    can be embedded media (e.g. <img> tags in the HTML), clicking on links,
-    JavaScript code (E.g XMLHttpRequest objects, JSON-P, Fetch, etc), and so on.
-    So, the fetch event handler is called every time your web pages requests a
-    resource over the internet. */
+/*  ----------------------- 3 - Call 'fetch' event for the service worker -----------------------    */
+/*  This is fired whenever the web page requests some resource. This can be embedded media (e.g. <img> tags in the HTML)
+    , clicking on links, JavaScript code (E.g XMLHttpRequest objects, JSON-P, Fetch, etc), and so on. So, the fetch
+    event handler is called every time your web pages requests a resource over the internet.    */
 self.addEventListener('fetch', function (e) {
 
     console.log("REQUEST TYPE - " + e.request.method);
 
-    /* if not a GET request */
+    /*  If not a GET request */
     if (e.request.method !== 'GET') {
         log(' fetch event ignored.', e.request.method, e.request.url);
         return;
     }
 
-    // Parse the URL
+    /*  Parse the URL   */
     const requestURL = new URL(e.request.url);
 
+    /*  Switch-case for different cases in cache policy.    */
     switch (requestURL.hostname) {
-        /*  local request */
-        /*  skip caching local JSON file(s) */
-        /*  Check network first and if not find then send back fallback content indicating the app is offline */
+
+        /*  Option 1 - Local request */
+        /*  Check network first and if not find then send back fallback content indicating the app is offline. */
         case "webdevcit.com" || "localhost":
-            log(' Fetching local request');
-            console.log(requestURL);
+            console.log('Fetch intercepted for:', requestURL);
+            /*  Option 1.a - local movieObj.js --> JSON-P containing Script data*/
+            /*  Cache Policy: Skip caching local JSON file(s) */
             if (/movieObj.js/.test(requestURL.href)) {
-                //skip caching local JSON file(s)
-                //check network first and if not find then send back fallback content indicating the app is offline
                 let fetchedP = fetch(e.request);
                 return fetchedP
                     .then(function (resp) {
@@ -152,13 +147,15 @@ self.addEventListener('fetch', function (e) {
                         );
                     });
             }
-            //if not JSON request
+            /*  Option 1.b - local request, which is not movieObj.js JSON-P file.    */
+            /*  Cache Policy: Cache immediately when SW installed. Check "install" event.   */
             else {
                 e.respondWith(
                     caches.open(cache_Name).then(function (cache) {
                         return cache.match(e.request).then(function (response) {
                             return response || fetch(e.request).then(function (response) {
                                 cache.put(e.request, response.clone());
+                                console.log("local file request");
                                 return response;
                             });
                         });
@@ -168,13 +165,13 @@ self.addEventListener('fetch', function (e) {
 
             break;
 
-        /* Flickr Image requests */
-        /* Check Cache first, Then Network (and cache the response) */
+        /*  Option 2 - Flickr Image requests */
+        /*  Check Cache first, Then Network (and cache the response) */
         case "farm66.static.flickr.com":
             log(' Fetching Flickr Image requests');
             console.log('Fetch intercepted for:', requestURL);
 
-            // I know we looking for 'jpg' files only but added 'gif' too here
+            /*  Comment: I know we looking for 'jpg' files only but added 'gif' too here.   */
             if (/\.(jpg|JPG|gif|GIF)$/.test(requestURL.href)) {
                 // console.log("---- Flickr IMAGE request detected ----");
                 e.respondWith(
@@ -199,11 +196,9 @@ self.addEventListener('fetch', function (e) {
 
             break;
 
-        //Flickr JSON request
-        /*  Check the Network first, if it can't be
-            accessed then just send back fallback content indicating
-            the app is offline (i.e. some JSON describing what
-            happened).*/
+        /*  Option 3 - Flickr JSON request  */
+        /*  Check the Network first, if it can't be accessed then just send back fallback content indicating
+            the app is offline (i.e. some JSON describing what happened).   */
         case "www.flickr.com":
             log(' Fetching Flickr JSON request');
             console.log(requestURL);
