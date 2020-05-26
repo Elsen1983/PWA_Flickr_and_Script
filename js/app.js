@@ -249,7 +249,6 @@ function onloadFunction() {
 
 function resizePage() {
     let x = document.getElementById("product_inner_container");
-    var buttons = document.getElementsByClassName("buttons");
 
     if (window.innerWidth === 479 || window.innerWidth < 479) {
         x.style.display = "none";
@@ -429,7 +428,8 @@ function makeButtons(type, term) {
                 if (checkNetwork() === false) {
                     checkNetworkOnLoad();
                 } else {
-                    addItemToLocalStorage('last_search', searchTerms[i])
+                    addItemToLocalStorage('last_search', searchTerms[i]);
+                    clearButtons(searchTerms[i]);
                     getImages(searchTerms[i]);
                 }
 
@@ -441,7 +441,8 @@ function makeButtons(type, term) {
                     checkNetworkOnLoad();
                 } else {
                     /*  add selected term into searchTerms */
-                    addItemToLocalStorage('last_search', searchTerms[i])
+                    addItemToLocalStorage('last_search', searchTerms[i]);
+                    clearButtons(searchTerms[i]);
                     getImages(searchTerms[i]);
                 }
             }
@@ -466,8 +467,35 @@ function checkNetwork() {
     }
 }
 
+function clearButtons(id){
+
+    console.log("------- CLEAR BUTTON");
+
+    let buttons = document.getElementsByClassName('buttons');
+    for (let i = 0; i < buttons.length; i++) {
+        let button = buttons[i];
+
+        if(button.getAttribute("id") !== id){
+            console.log("++++++++ "+ button.getAttribute("id") + " BUTTON");
+            if (window.innerWidth === 1023 || window.innerWidth < 1023) {
+                button.style.color = "#fff";
+            }
+            if (window.innerWidth > 1023) {
+                button.style.color = "#000";
+            }
+        }
+        else{
+            console.log("++++++++ same BUTTON");
+            selectUsedButton(id);
+
+        }
+
+
+    }
+}
+
 function selectUsedButton(id){
-    console.log("selectUsedButton called");
+    console.log("------- SELECTED BUTTON");
     let used = document.getElementById(id);
     used.style.color = "#0000CD";
 }

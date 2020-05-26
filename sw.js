@@ -120,6 +120,9 @@ self.addEventListener('fetch', function (e) {
     if (e.request.method !== 'GET') {
         log(' fetch event ignored.', e.request.method, e.request.url);
         return;
+    }else{
+        console.log("Method: " + e.request.method);
+        console.log("Destination: " + e.request.destination);
     }
 
     /*  Parse the URL   */
@@ -245,6 +248,14 @@ self.addEventListener('fetch', function (e) {
 });
 
 /*  ----------------------- 4 - Functions -----------------------   */
+
+
+/*  Request.destination : https://developer.mozilla.org/en-US/docs/Web/API/Request/destination  */
+function isImage(fetchRequest) {
+    return (
+        fetchRequest.method === 'GET' && fetchRequest.destination === 'image'
+    );
+}
 
 /*  Each logging line will be prepended with the service worker version */
 function log(message) {
