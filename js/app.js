@@ -19,9 +19,9 @@ function init() {
 /*  ----------------------- Search Flickr - getImages -----------------------    */
 function getImages(searchTermText) {
 
-    console.log('%c getImages() called with ' + searchTermText, 'background: #222; color: #bada55');
+    addArrowButtons();
 
-    window.localStorage.setItem('last_search', searchTermText);
+    console.log('%c getImages() called with ' + searchTermText, 'background: #222; color: #bada55');
 
     let base_url = "https://www.flickr.com/services/rest?";
     let request = "method=flickr.photos.search";
@@ -340,6 +340,8 @@ function checkNetworkOnLoad() {
                 loadImagesFromCache(images_LocalStorage);
                 addArrowButtons();
                 makeButtons("checkNetwork", last_search_term);
+                selectUsedButton(last_search_term);
+
 
             }
         }
@@ -348,7 +350,7 @@ function checkNetworkOnLoad() {
             console.log("App is ONLINE");
 
             if (typeof (document.getElementById("serverStatus")) != 'undefined' && document.getElementById("serverStatus") != null) {
-               // document.getElementById("topOfContent").innerHTML = "";
+                removeOnlineStatus("serverStatus");
             }
 
             /*  Option 2.a - LOCALSTORAGE is NOT used earlier.  */
@@ -360,16 +362,14 @@ function checkNetworkOnLoad() {
             /*  Option 2.b - LOCALSTORAGE is used earlier.  */
             else {
                 console.log("LOCALSTORAGE is used earlier.");
-                /*  create the buttons */
-                makeButtons("searchNetwork", last_search_term);
                 /*  load images from Cache */
                 console.log("load images from CACHE...");
                 loadImagesFromCache(images_LocalStorage);
-
-                /*FINISHED here 16th of May*/
-
                 addArrowButtons();
-                //getImages(last_search_term);
+                /*  create the buttons */
+                makeButtons("searchNetwork", last_search_term);
+                selectUsedButton(last_search_term);
+
 
 
                 // loadImagesFromCache();
@@ -416,9 +416,10 @@ function makeButtons(type, term) {
         let newT = document.createTextNode(searchTerms[i]);
         newB.appendChild(newT);
 
-
         /*  add buttons to the 'sidebar' */
         document.getElementById("buttons_Nav").appendChild(newB);
+
+
         /*  add event listeners to the buttons */
         newB.addEventListener("click", function () {
 
@@ -428,6 +429,7 @@ function makeButtons(type, term) {
                 if (checkNetwork() === false) {
                     checkNetworkOnLoad();
                 } else {
+                    addItemToLocalStorage('last_search', searchTerms[i])
                     getImages(searchTerms[i]);
                 }
 
@@ -439,11 +441,14 @@ function makeButtons(type, term) {
                     checkNetworkOnLoad();
                 } else {
                     /*  add selected term into searchTerms */
+                    addItemToLocalStorage('last_search', searchTerms[i])
                     getImages(searchTerms[i]);
                 }
             }
         });
+
     }
+
 }
 
 function checkNetwork() {
@@ -459,6 +464,12 @@ function checkNetwork() {
         onlineStatus = true;
         return onlineStatus;
     }
+}
+
+function selectUsedButton(id){
+    console.log("selectUsedButton called");
+    let used = document.getElementById(id);
+    used.style.color = "#0000CD";
 }
 
 function addOfflineStatus(parent) {
@@ -494,34 +505,34 @@ function loadImagesFromCache(imagesFromLocalStorage) {
 
     document.getElementById('content_div').innerHTML = "";
 
+    let loader = document.createElement("img");
+    loader.src = 'img/loaderGif.gif';
+    loader.className = "loader";
+
     for (let i = 0; i < fromLocal.length; i++) {
 
         if (caches.match(newImageArray[i].imageSRC)) {
-            console.log("image is in the cache");
+            // console.log("image is in the cache");
 
             let divObj = document.createElement("li");
             divObj.className = "imageTag";
-            let loader = document.createElement("img");
-            loader.src = 'img/loaderGif.gif';
-            loader.className = "loader";
+
             divObj.appendChild(loader);
 
-            /*
-                * We call the loadImage function and call .then
-                * on the Promise that it returns, passing a function that we
-                * want to receive the realized Image
-                */
+            /*  We call the loadImage function and call .then on the Promise that it returns,
+                passing a function that we want to receive the realized Image.    */
             let tempPromise = loadImage(fromLocal[i].imageSRC, fromLocal[i].imageTitle);
 
-            tempPromise.then(function (resolvedImage) {
+            tempPromise.then(resolvedImage => {
                 divObj.innerHTML = "";
                 divObj.appendChild(resolvedImage);
+            }).catch(error => {
+               console.log(error);
             });
             promiseArray.push(tempPromise);
 
             document.getElementById('content_div').appendChild(divObj);
         }
-
 
     }
     Promise.all(promiseArray).then(enableButtons);
@@ -530,7 +541,7 @@ function loadImagesFromCache(imagesFromLocalStorage) {
 function loadImage(url, title) {
 
     console.log('%c loadImage() called', 'background: #222; color: #bada55');
-    /*  We are going to return a Promise which, when we .then will give us an Image that should be fully loaded. */
+    /*  We are going to return a Promise when .then() will give us an Image that should be fully loaded. */
     return new Promise((resolve, reject) => {
         /*  Create the image that we are going to use to hold the resource.  */
         const imageObject = new Image();
