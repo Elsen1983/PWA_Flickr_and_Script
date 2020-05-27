@@ -83,10 +83,10 @@ button {
   list-style-type: none;
   text-align: center;
   margin: 2%;
-  border: 1px #a9a9a9 solid;
+  border: 2px #5f5e5e solid;
   border-radius: 7px;
-  background-color: grey;
-  color: #fff;
+  background-color: #ababad;
+  color: #000000;
   font-weight: 700;
   font-size: 1em;
   flex: 46%;
@@ -148,9 +148,10 @@ button {
   -ms-overflow-style: none
 }
 
-/*#serverStatus{*/
-/*  display: none;*/
-/*}*/
+#serverStatus{
+  color: crimson;
+  font-size: 1.2em;
+}
 
 #loading_txt {
   display: block;
@@ -444,7 +445,7 @@ button {
     width: 256px;
     float: left;
     background-color: #fff;
-    color: #000;
+    color: #000000;
     border: none;
     font-size: 1.2rem
   }

@@ -138,6 +138,8 @@ self.addEventListener('fetch', function (e) {
             /*  Option 1.a - local movieObj.js --> JSON-P containing Script data*/
             /*  Cache Policy: Skip caching local JSON file(s) */
             if (/movieObj.js/.test(requestURL.href)) {
+
+
                 let fetchedP = fetch(e.request);
                 return fetchedP
                     .then(function (resp) {
@@ -170,7 +172,8 @@ self.addEventListener('fetch', function (e) {
             break;
 
         /*  Option 2 - Flickr Image requests */
-        /*  Check Cache first, Then Network (and cache the response) */
+        /*  If a request doesn't match anything in the cache, get it from the network,
+            send it to the page and add it to the cache at the same time.   */
         case "farm66.static.flickr.com":
             log(' Fetching Flickr Image requests');
             console.log('Fetch intercepted for:', requestURL);
@@ -206,6 +209,17 @@ self.addEventListener('fetch', function (e) {
         case "www.flickr.com":
             log(' Fetching Flickr JSON request');
             console.log(requestURL);
+            e.respondWith(
+                /*  first check network*/
+                fetch(e.request)
+                    .catch(
+                           /*   send back fallback  */
+                        function() { return new Response(
+                            "showImages({offline: true})",
+                            {headers: {"Content-Type": "text/javascript"}}
+                        );}
+                    )
+            );
             break;
     }
 

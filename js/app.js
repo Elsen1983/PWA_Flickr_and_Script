@@ -114,7 +114,6 @@ function showImages(images) {
 
 /*  Constructor for FlickrImages object    */
 function FlickrImage(image_URL, image_Title, image_NameAndExtension) {
-    // console.log("FlickrImage constructor called");
     this.imageSRC = image_URL;
     this.imageTitle = image_Title;
     this.imageName = image_NameAndExtension;
@@ -370,7 +369,6 @@ function checkNetworkOnLoad() {
                 selectUsedButton(last_search_term);
 
 
-
                 // loadImagesFromCache();
 
             }
@@ -418,10 +416,8 @@ function makeButtons(type, term) {
         /*  add buttons to the 'sidebar' */
         document.getElementById("buttons_Nav").appendChild(newB);
 
-
         /*  add event listeners to the buttons */
         newB.addEventListener("click", function () {
-
             if (type === "checkNetwork") {
                 console.log("button pressed -> check Network because app offline");
                 /* double check the network when button clicked */
@@ -432,7 +428,6 @@ function makeButtons(type, term) {
                     clearButtons(searchTerms[i]);
                     getImages(searchTerms[i]);
                 }
-
             }
             if (type === "searchNetwork") {
                 console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
@@ -447,9 +442,7 @@ function makeButtons(type, term) {
                 }
             }
         });
-
     }
-
 }
 
 function checkNetwork() {
@@ -467,35 +460,22 @@ function checkNetwork() {
     }
 }
 
-function clearButtons(id){
-
-    console.log("------- CLEAR BUTTON");
+function clearButtons(id) {
 
     let buttons = document.getElementsByClassName('buttons');
     for (let i = 0; i < buttons.length; i++) {
         let button = buttons[i];
 
-        if(button.getAttribute("id") !== id){
-            console.log("++++++++ "+ button.getAttribute("id") + " BUTTON");
-            if (window.innerWidth === 1023 || window.innerWidth < 1023) {
-                button.style.color = "#fff";
-            }
-            if (window.innerWidth > 1023) {
-                button.style.color = "#000";
-            }
-        }
-        else{
-            console.log("++++++++ same BUTTON");
+        if (button.getAttribute("id") !== id) {
+            button.style.color = "#000000";
+
+        } else {
             selectUsedButton(id);
-
         }
-
-
     }
 }
 
-function selectUsedButton(id){
-    console.log("------- SELECTED BUTTON");
+function selectUsedButton(id) {
     let used = document.getElementById(id);
     used.style.color = "#0000CD";
 }
@@ -555,7 +535,7 @@ function loadImagesFromCache(imagesFromLocalStorage) {
                 divObj.innerHTML = "";
                 divObj.appendChild(resolvedImage);
             }).catch(error => {
-               console.log(error);
+                console.log(error);
             });
             promiseArray.push(tempPromise);
 
@@ -601,3 +581,4 @@ function loadImage(url, title) {
         imageObject.src = url;
     });
 }
+
