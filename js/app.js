@@ -11,7 +11,6 @@ window.addEventListener('resize', resizePage);
 function init() {
     onloadFunction();
     checkNetworkOnLoad();
-    // loadFromStorage();
 
 }
 
@@ -145,7 +144,6 @@ FlickrImage.prototype.getImageObject = function () {
     });
 };
 
-
 function imageTitleOnModal(getTitle) {
     // console.log("getModalAndZoomImages called with title: " + getTitle);
     const modalPlace = document.getElementById("body_Tag");
@@ -165,7 +163,6 @@ function imageTitleOnModal(getTitle) {
     modal.appendChild(subModal);
     modalPlace.appendChild(modal);
 }
-
 
 /* ------------------------ Place Images on the Page ------------ */
 function createImages(flickr_array) {
@@ -204,7 +201,6 @@ function createImages(flickr_array) {
     // a certain time has elapsed
 }
 
-
 /* ----------------- Enable and Display search buttons ----------- */
 function enableButtons() {
     for (let i = 0; i < buttons.length; i++) {
@@ -221,7 +217,6 @@ function disableButtons() {
         buttons[i].style.opacity = "0.6"; //This grays it out to look disabled
     }
 }
-
 
 /* ----------------------- Functions for the basic site functionalities (e.g. hide buttons) */
 
@@ -513,19 +508,16 @@ function loadImagesFromCache(imagesFromLocalStorage) {
 
     document.getElementById('content_div').innerHTML = "";
 
-    let loader = document.createElement("img");
-    loader.src = 'img/loaderGif.gif';
-    loader.className = "loader";
 
     for (let i = 0; i < fromLocal.length; i++) {
 
         if (caches.match(newImageArray[i].imageSRC)) {
-            // console.log("image is in the cache");
+
+
 
             let divObj = document.createElement("li");
             divObj.className = "imageTag";
 
-            divObj.appendChild(loader);
 
             /*  We call the loadImage function and call .then on the Promise that it returns,
                 passing a function that we want to receive the realized Image.    */
@@ -582,3 +574,61 @@ function loadImage(url, title) {
     });
 }
 
+/*  Add a button to the page that allows you delete all the files
+    you downloaded from Flickr (and only those files) from the cache.
+    However, shouldn't delete the images of the last search
+    assuming there was one. */
+async function deleteCachedImages() {
+
+    let images_LocalStorage = window.localStorage.getItem("images");
+
+    let fromLocal = (images_LocalStorage) ? JSON.parse(images_LocalStorage) : [];
+    let fromLocalUrls = fromLocal.map(x => x.imageSRC);
+
+    let cachedImages = [];
+    let differentImages = [];
+
+    // Get a list of all of the caches for this origin
+    const cacheNames = await caches.keys();
+
+    for (const name of cacheNames) {
+        // Open the cache
+        const cache = await caches.open(name);
+
+        // Get a list of entries. Each item is a Request object
+        for (const request of await cache.keys()) {
+            // If the request URL matches, add the response to the result
+            if (request.url.startsWith('https://farm66.static.flickr.com')
+                && request.url.endsWith('.jpg' || '.gif' || '.png')) {
+                cachedImages.push(request.url);
+            }
+        }
+    }
+
+    /*  Find the different images.  */
+    differentImages = cachedImages.filter(e => !fromLocalUrls.includes(e));
+
+    // console.log("------ LOCALSTORAGE IMAGES   -----");
+    // fromLocalUrls.forEach(function (entry) {
+    //     console.log(entry);
+    // });
+    // console.log("------ CACHED IMAGES   -----");
+    // cachedImages.forEach(function (entry) {
+    //     console.log(entry);
+    // });
+    //
+    // console.log("------ DIFFERENT IMAGES   -----");
+    // differentImages.forEach(function (entry) {
+    //     console.log(entry);
+    // });
+
+    /* Delete the 'different' images from cache.    */
+    caches.open(cacheNames.toString()).then(function (cache) {
+        for (let i = 0; i < differentImages.length; i++) {
+            cache.delete(differentImages[i].toString()).then(function (response) {
+                // console.log("Removed from cache: " + differentImages[i].toString());
+            });
+        }
+    })
+
+}

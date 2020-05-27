@@ -123,6 +123,7 @@ self.addEventListener('fetch', function (e) {
     }else{
         console.log("Method: " + e.request.method);
         console.log("Destination: " + e.request.destination);
+        console.log("URL: " + e.request.url);
     }
 
     /*  Parse the URL   */
