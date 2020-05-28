@@ -1,6 +1,6 @@
-/*  importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js'); */
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js');
 
-/*  workbox.googleAnalytics.initialize(); */
+workbox.googleAnalytics.initialize();
 
 /*  Current version of the cache.   */
 const cache_Name = 'v1';
@@ -114,32 +114,27 @@ self.addEventListener('activate', function (e) {
     event handler is called every time your web pages requests a resource over the internet.    */
 self.addEventListener('fetch', function (e) {
 
-    console.log("REQUEST TYPE - " + e.request.method);
-
     /*  If not a GET request */
     if (e.request.method !== 'GET') {
         log(' fetch event ignored.', e.request.method, e.request.url);
         return;
     }else{
-        console.log("Method: " + e.request.method);
-        console.log("Destination: " + e.request.destination);
-        console.log("URL: " + e.request.url);
+        console.log("Method: " + e.request.method + ",  Destination: " + e.request.destination + ", URL: " + e.request.url);
     }
 
     /*  Parse the URL   */
     const requestURL = new URL(e.request.url);
+    console.log('Fetch intercepted for:', requestURL);
+
 
     /*  Switch-case for different cases in cache policy.    */
     switch (requestURL.hostname) {
-
         /*  Option 1 - Local request */
         /*  Check network first and if not find then send back fallback content indicating the app is offline. */
         case "webdevcit.com" || "localhost":
-            console.log('Fetch intercepted for:', requestURL);
             /*  Option 1.a - local movieObj.js --> JSON-P containing Script data*/
             /*  Cache Policy: Skip caching local JSON file(s) */
             if (/movieObj.js/.test(requestURL.href)) {
-
 
                 let fetchedP = fetch(e.request);
                 return fetchedP
@@ -176,9 +171,7 @@ self.addEventListener('fetch', function (e) {
         /*  If a request doesn't match anything in the cache, get it from the network,
             send it to the page and add it to the cache at the same time.   */
         case "farm66.static.flickr.com":
-            log(' Fetching Flickr Image requests');
-            console.log('Fetch intercepted for:', requestURL);
-
+            // log(' Fetching Flickr Image requests');
             /*  Comment: I know we looking for 'jpg' files only but added 'gif' too here.   */
             if (/\.(jpg|JPG|gif|GIF)$/.test(requestURL.href)) {
                 // console.log("---- Flickr IMAGE request detected ----");
@@ -189,7 +182,7 @@ self.addEventListener('fetch', function (e) {
                                 .then(response => {
                                     return response || fetch(e.request)
                                         .then(response => {
-                                            console.log("Image is not in the cache, so caching it.");
+                                            // console.log("Image is not in the cache, so caching it.");
                                             cache.put(e.request, response.clone());
                                             return response;
                                         })
@@ -208,8 +201,7 @@ self.addEventListener('fetch', function (e) {
         /*  Check the Network first, if it can't be accessed then just send back fallback content indicating
             the app is offline (i.e. some JSON describing what happened).   */
         case "www.flickr.com":
-            log(' Fetching Flickr JSON request');
-            console.log(requestURL);
+            // log(' Fetching Flickr JSON request');
             e.respondWith(
                 /*  first check network*/
                 fetch(e.request)
@@ -223,42 +215,6 @@ self.addEventListener('fetch', function (e) {
             );
             break;
     }
-
-    // //https://developers.google.com/web/fundamentals/primers/service-workers
-    // //console.log('Fetch intercepted for:', e.request.url);
-    //
-    // e.respondWith(
-    //     caches.match(e.request)
-    //         .then(function(response) {
-    //             // Cache hit - return response
-    //             if (response) {
-    //                 return response;
-    //             }
-    //
-    //             return fetch(e.request).then(
-    //                 function(response) {
-    //                     // Check if we received a valid response
-    //                     if(!response || response.status !== 200 || response.type !== 'basic') {
-    //                         return response;
-    //                     }
-    //
-    //                     // IMPORTANT: Clone the response. A response is a stream
-    //                     // and because we want the browser to consume the response
-    //                     // as well as the cache consuming the response, we need
-    //                     // to clone it so we have two streams.
-    //                     var responseToCache = response.clone();
-    //
-    //                     caches.open(cache_Name)
-    //                         .then(function(cache) {
-    //                             cache.put(e.request, responseToCache);
-    //                         });
-    //
-    //                     return response;
-    //                 }
-    //             );
-    //         })
-    // );
-
 
 });
 

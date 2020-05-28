@@ -14,7 +14,6 @@ function init() {
 
 }
 
-
 /*  ----------------------- Search Flickr - getImages -----------------------    */
 function getImages(searchTermText) {
 
@@ -513,11 +512,8 @@ function loadImagesFromCache(imagesFromLocalStorage) {
 
         if (caches.match(newImageArray[i].imageSRC)) {
 
-
-
             let divObj = document.createElement("li");
             divObj.className = "imageTag";
-
 
             /*  We call the loadImage function and call .then on the Promise that it returns,
                 passing a function that we want to receive the realized Image.    */
@@ -533,7 +529,6 @@ function loadImagesFromCache(imagesFromLocalStorage) {
 
             document.getElementById('content_div').appendChild(divObj);
         }
-
     }
     Promise.all(promiseArray).then(enableButtons);
 }
