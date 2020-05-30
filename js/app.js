@@ -374,6 +374,25 @@ function checkNetworkOnLoad() {
         console.log("-----------------------");
         console.log("---- Script Search ----");
         console.log("-----------------------\n");
+
+        /*  Check that the application is offline or online. */
+        checkNetwork();
+
+        /*  Add web-worker  */
+        if (window.Worker) {
+            console.log("Your browser support WebWorkers!");
+            var webworker = new Worker("./js/web_worker.js");
+
+            webworker.postMessage("data");
+
+            webworker.onmessage = function(e){
+                document.getElementById("content_div").innerHTML = e.data;
+            }
+        }
+        else{
+            alert("Your browser not support WebWorkers!");
+        }
+
     }
 }
 
@@ -625,5 +644,9 @@ async function deleteCachedImages() {
             });
         }
     })
+
+}
+
+function searchMovie(){
 
 }

@@ -155,6 +155,13 @@ input[type=text]:focus {
 #content_area {
   -ms-overflow-style: none;
 }
+
+#serverStatus{
+  color: crimson;
+  font-size: 1.2em;
+}
+
+
 #loader{
   position: absolute;
   /*-8px, because the size of the gif is 16px*/
