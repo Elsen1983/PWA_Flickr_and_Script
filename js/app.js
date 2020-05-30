@@ -3,6 +3,7 @@ const searchTerms = ["Ivan Aivazovsky", "Henry Pether", "Robin Jacques"];
 var images_Array = [];
 var buttons = document.getElementsByClassName("buttons");
 var flickrImageArray = [];
+var webWorker;
 
 /* ----------------------- Setup the page ----------------------- */
 window.addEventListener("load", init);
@@ -375,21 +376,25 @@ function checkNetworkOnLoad() {
         console.log("---- Script Search ----");
         console.log("-----------------------\n");
 
-        /*  Check that the application is offline or online. */
-        checkNetwork();
 
-        /*  Add web-worker  */
+        /*  If browser supports WebWorkers then add web-worker  */
         if (window.Worker) {
             console.log("Your browser support WebWorkers!");
-            var webworker = new Worker("./js/web_worker.js");
 
-            webworker.postMessage("data");
+            /*  Start a Web Worker. */
+            startWorker();
 
-            webworker.onmessage = function(e){
-                document.getElementById("content_div").innerHTML = e.data;
-            }
-        }
-        else{
+            let input = document.getElementById("searchField");
+
+            /*  Add eventListener to the input field.   */
+            input.addEventListener("input", function (evt) {
+                /*  if the input is not empty after .trim() then call the searchMovie() function. */
+                /*  .trim() is not supported in Internet Explorer 8 and earlier versions. */
+                if (this.value.trim() !== "") {
+                    searchMovie(this.value);
+                }
+            });
+        } else {
             alert("Your browser not support WebWorkers!");
         }
 
@@ -647,6 +652,41 @@ async function deleteCachedImages() {
 
 }
 
-function searchMovie(){
+function searchMovie(searchText) {
 
+    //Delaying the function execute
+    if (this.timer) {
+        window.clearTimeout(this.timer);
+    }
+    this.timer = window.setTimeout(function() {
+        /*  Execute the function 500 millisecond after when user stop typing.   */
+
+        /*  Check that the application is offline or online every time when user type a character. */
+        if (checkNetwork() === true) {
+
+            /*  Clear the content area.  */
+            document.getElementById("content_div").innerHTML = "";
+
+            webWorker.postMessage(searchText);
+
+            webWorker.onmessage = function (e) {
+                document.getElementById("content_div").innerHTML = e.data;
+            }
+
+            // webWorker.addEventListener('message', function(e) {
+            //     document.getElementById('result').textContent = e.data;
+            // }, false);
+        }
+    }, 500);
+
+}
+
+function startWorker() {
+    if (typeof(webWorker) == "undefined") {
+        webWorker = new Worker("./js/web_worker.js");
+    }
+}
+function stopWorker() {
+    webWorker.terminate();
+    webWorker = undefined;
 }

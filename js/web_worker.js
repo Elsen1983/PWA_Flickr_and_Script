@@ -42,17 +42,37 @@
     one message.
 * */
 
+//importScripts("../json/movieObj.js");
+
+var movies = [];
 
 onmessage = function(e){
     console.log("Webworker called with: " + e.data);
 
-    if(e.data === "data"){
+    if(e.data === "alma fa"){
         postMessage("done");
     }else{
         postMessage("fail");
     }
 
 }
+
+// self.addEventListener('message', function(e) {
+//     var data = e.data;
+//     switch (data.cmd) {
+//         case 'start':
+//             self.postMessage('WORKER STARTED: ' + data.msg);
+//             break;
+//         case 'stop':
+//             self.postMessage('WORKER STOPPED: ' + data.msg +
+//                 '. (buttons will no longer work)');
+//             self.close(); // Terminates the worker.
+//             break;
+//         default:
+//             self.postMessage('Unknown command: ' + data.msg);
+//     };
+// }, false);
+
 
 
 //----------------
@@ -71,3 +91,19 @@ onmessage = function(e){
 //             postMessage ({title: obj.data.movies[i].title, url: obj.data.movies[i].url})
 //     }
 // }
+
+
+// function processFilms(jsonp) {
+//     for (let key in jsonp) {
+//         let obj = {
+//             title: jsonp[key].title,
+//             url: jsonp[key].link
+//         }
+//         movies.push(obj)
+//     }
+// }
+
+/*  Used references */
+/*  Using Web Workers : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers  */
+/*  The Basics of Web Workers : https://www.html5rocks.com/en/tutorials/workers/basics/ */
+/*  WebWorker example using importScript  : https://gist.github.com/akirattii/8e6b579c59bd24a1bebfe9e192fbed45  */
