@@ -134,7 +134,9 @@ self.addEventListener('fetch', function (e) {
         case "webdevcit.com" || "localhost":
             /*  Option 1.a - local movieObj.js --> JSON-P containing Script data*/
             /*  Cache Policy: Skip caching local JSON file(s) */
-            if (/movieObj.js/.test(requestURL.href)) {
+            if (requestURL.href.endsWith("movieObj.js")) {
+
+                // console.log("movieObj.js file called in service worker!")
 
                 let fetchedP = fetch(e.request);
                 return fetchedP
@@ -151,6 +153,7 @@ self.addEventListener('fetch', function (e) {
             /*  Option 1.b - local request, which is not movieObj.js JSON-P file.    */
             /*  Cache Policy: Cache immediately when SW installed. Check "install" event.   */
             else {
+                // console.log("local file cashed...")
                 e.respondWith(
                     caches.open(cache_Name).then(function (cache) {
                         return cache.match(e.request).then(function (response) {

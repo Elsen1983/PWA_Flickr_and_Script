@@ -1,4 +1,3 @@
-
 /*  The web worker should do the following in response to a search term sent
     to it:
     1 - Automatically search though each film (i.e. loop through the
@@ -42,66 +41,95 @@
     one message.
 * */
 
-//importScripts("../json/movieObj.js");
-
 var movies = [];
 
-onmessage = function(e){
-    console.log("Webworker called with: " + e.data);
+let filmTitleSearch = "";
+let outputMessage = {};
 
-    if(e.data === "alma fa"){
-        postMessage("done");
-    }else{
-        postMessage("fail");
+
+let foundFilmNumber = 0;
+
+let currentPercentage = 0;
+let previousPercentage = 0;
+
+
+onmessage = function (incomingMessage) {
+
+    console.log("Webworker called with: " + incomingMessage.data);
+
+    filmTitleSearch = incomingMessage.data;
+
+
+    try {
+        /*  Import the movieObj.js for films 'database'.  */
+        /*  This time the processFilms(jsonp) function will called.   */
+        importScripts("movieObj.js");
+    } catch (error) {
+        postMessage(error);
     }
+
+
+    for (let i = 0; i < movies.length; i++) {
+        currentPercentage = Math.round((i / movies.length) * 100);
+
+
+        if (previousPercentage !== currentPercentage) {
+            previousPercentage = currentPercentage;
+            //setTimeout(function () {
+                postMessage(currentPercentage);
+                console.log("percentage: " + currentPercentage);
+            //}, 100);
+
+        }
+        if (previousPercentage === 100) {
+            postMessage(100);
+
+        }
+
+    }
+    postMessage(100);
+
+    /*  display the first 100 result from 'movies' array.   */
+    let resultMoviesLimit = 100;
+    outputMessage = movies.slice(0, resultMoviesLimit).map(film => ({title: film.title, url: film.url}));
+
+    console.log(outputMessage);
+    postMessage(outputMessage);
 
 }
 
-// self.addEventListener('message', function(e) {
-//     var data = e.data;
-//     switch (data.cmd) {
-//         case 'start':
-//             self.postMessage('WORKER STARTED: ' + data.msg);
-//             break;
-//         case 'stop':
-//             self.postMessage('WORKER STOPPED: ' + data.msg +
-//                 '. (buttons will no longer work)');
-//             self.close(); // Terminates the worker.
-//             break;
-//         default:
-//             self.postMessage('Unknown command: ' + data.msg);
-//     };
-// }, false);
+function processFilms(jsonp) {
+    // console.log("ProcessFilms called ...");
+    /*  Must clear the movies array every time when new call is happening from app.js.  */
+    movies.length = 0;
+    foundFilmNumber = 0;
+
+    for (let key in jsonp) {
+        let filmTitle = jsonp[key].title.toString().toLowerCase();
+
+        let filmObject = {
+            title: markTitleSearch(jsonp[key].title, filmTitleSearch),
+            url: jsonp[key].link
+        }
+
+        if (filmTitle.match(filmTitleSearch.toLowerCase())) {
+            foundFilmNumber = movies.length + 1;
+            movies.push(filmObject);
+        }
+
+    }
+    console.log("ProcessFilms Search finished...");
+}
+
+
+/*  Use this function to put <mark>text<mark> into the result title. In app.js use it to highlight the result.*/
+function markTitleSearch(text, term) {
+    return text.replace(new RegExp(term, "ig"), "<span class='insideSpan'>$&</span>");
+}
 
 
 
-//----------------
-// onmessage = function(obj){
-//
-//     for (var i = 0; i < obj.data.movies.length; i++) {
-//         // console.log(obj.data.movies.length-1 == i-1)
-//         var percentage = Math.round((i/obj.data.movies.length)*100)
-//         if(lastPerc != percentage) {
-//             var lastPerc = percentage
-//             postMessage ({perc: lastPerc})
-//             if(lastPerc == 100)
-//                 postMessage ({finished: true})
-//         }
-//         if(obj.data.movies[i].title.includes(obj.data.val))
-//             postMessage ({title: obj.data.movies[i].title, url: obj.data.movies[i].url})
-//     }
-// }
 
-
-// function processFilms(jsonp) {
-//     for (let key in jsonp) {
-//         let obj = {
-//             title: jsonp[key].title,
-//             url: jsonp[key].link
-//         }
-//         movies.push(obj)
-//     }
-// }
 
 /*  Used references */
 /*  Using Web Workers : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers  */

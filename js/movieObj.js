@@ -1,4 +1,5 @@
-processFilms({ '1': 
+processFilms(
+    { '1':
    { scrape_id: '1',
      title: '10 things i hate about you',
      source: 'cornell',

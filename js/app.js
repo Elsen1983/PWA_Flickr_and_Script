@@ -388,11 +388,26 @@ function checkNetworkOnLoad() {
 
             /*  Add eventListener to the input field.   */
             input.addEventListener("input", function (evt) {
+
+
+
+                if (evt.inputType === "deleteContentBackward" || evt.inputType === "deleteContentForward") {
+                    console.log("Delete");
+                    if(this.value.trim() === ""){
+                        document.getElementById("content_div").innerHTML = "";
+                        document.getElementById("percentage").textContent = "0";
+                        document.getElementById("progressBar").value = "0";
+                    }else{
+                        searchMovie(this.value);
+                    }
+                }
+
                 /*  if the input is not empty after .trim() then call the searchMovie() function. */
                 /*  .trim() is not supported in Internet Explorer 8 and earlier versions. */
                 if (this.value.trim() !== "") {
                     searchMovie(this.value);
                 }
+
             });
         } else {
             alert("Your browser not support WebWorkers!");
@@ -654,6 +669,7 @@ async function deleteCachedImages() {
 
 function searchMovie(searchText) {
 
+    console.log("The input was: " + searchText);
     //Delaying the function execute
     if (this.timer) {
         window.clearTimeout(this.timer);
@@ -670,12 +686,27 @@ function searchMovie(searchText) {
             webWorker.postMessage(searchText);
 
             webWorker.onmessage = function (e) {
-                document.getElementById("content_div").innerHTML = e.data;
+                if(typeof e.data === "number"){
+                    // console.log("Percentage: " + e.data);
+                    document.getElementById("percentage").textContent = e.data;
+                    document.getElementById("progressBar").value = e.data;
+                }
+                else{
+                    for(let i =0; i < e.data.length; i++){
+                        let button = document.createElement("button");
+                        button.setAttribute("class", "openLinkButton");
+                        button.innerHTML = e.data[i].title;
+                        button.addEventListener("click", function () {
+                            window.open(e.data[i].url);
+                        });
+                        document.getElementById("content_div").appendChild(button);
+                    }
+                    // document.getElementById("content_div").innerHTML = e.data.title;
+                }
+
+
             }
 
-            // webWorker.addEventListener('message', function(e) {
-            //     document.getElementById('result').textContent = e.data;
-            // }, false);
         }
     }, 500);
 

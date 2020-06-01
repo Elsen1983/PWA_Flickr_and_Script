@@ -160,7 +160,32 @@ input[type=text]:focus {
   color: crimson;
   font-size: 1.2em;
 }
+progress:not([value]) {
+  /* Styling here */
+}
+progress[value] {
+  /* Reset the default appearance */
+  -webkit-appearance: none;
+  appearance: none;
 
+  width: 250px;
+  height: 20px;
+}
+
+progress[value]::-webkit-progress-bar {
+  background-color: #eee;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+
+.openLinkButton{
+  font-family: cursive;
+  padding: 5px;
+  margin: 5px;
+}
+.insideSpan{
+  font-weight: bolder;
+}
 
 #loader{
   position: absolute;
@@ -168,8 +193,7 @@ input[type=text]:focus {
   top: calc(50% - 8px);
   left: calc(50% - 8px);
 }
-#content_area{
-}
+
 #content{
   display: grid;
   grid-template-columns: 1fr;
