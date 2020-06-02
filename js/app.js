@@ -227,7 +227,7 @@ function onloadFunction() {
     let installButton = document.getElementById("installBanner");
     let footer = document.getElementById("footer_container");
 
-    console.log(installButton.style.display);
+    // console.log(installButton.style.display);
 
     if(installButton.style.display !== "none"){
         console.log("installBtn there");
@@ -301,7 +301,7 @@ function addArrowButtons() {
 
 function checkNetworkOnLoad() {
 
-    console.log('%c checkNetwork() called', 'background: #222; color: #bada55');
+    // console.log('%c checkNetwork() called', 'background: #222; color: #bada55');
 
     /*  Check that the button_Nav is exists or not --> index.html or search2.html */
     /*  Option A - index.html --> Flickr search */
@@ -309,7 +309,6 @@ function checkNetworkOnLoad() {
         console.log("-----------------------");
         console.log("---- Flickr Search ----");
         console.log("-----------------------\n");
-
 
         let last_search_term = window.localStorage.getItem("last_search");
         let images_LocalStorage = window.localStorage.getItem("images");
@@ -320,7 +319,7 @@ function checkNetworkOnLoad() {
 
             /*  Highlight the app is offline at the moment */
             if (typeof (document.getElementById("serverStatus")) != 'undefined' && document.getElementById("serverStatus") != null) {
-
+                /*  Do nothing then.    */
             } else {
                 addOfflineStatus("topOfContent");
             }
@@ -331,7 +330,6 @@ function checkNetworkOnLoad() {
                 document.getElementById('loading_txt').innerHTML = "Sorry, Can't access Flickr.";
                 document.getElementById('content_div').innerHTML = "Try again later.";
                 makeButtons("checkNetwork", last_search_term);
-
             }
             /*  Option 1.b - LOCALSTORAGE is used earlier.  */
             else {
@@ -341,8 +339,6 @@ function checkNetworkOnLoad() {
                 addArrowButtons();
                 makeButtons("checkNetwork", last_search_term);
                 selectUsedButton(last_search_term);
-
-
             }
         }
         /* Option 2 - App is Online */
@@ -369,9 +365,7 @@ function checkNetworkOnLoad() {
                 /*  create the buttons */
                 makeButtons("searchNetwork", last_search_term);
                 selectUsedButton(last_search_term);
-
             }
-
         }
     }
     /*  Option B - search2.html --> Search SCRIPT */
@@ -379,7 +373,6 @@ function checkNetworkOnLoad() {
         console.log("-----------------------");
         console.log("---- Script Search ----");
         console.log("-----------------------\n");
-
 
         /*  If browser supports WebWorkers then add web-worker  */
         if (window.Worker) {
@@ -392,11 +385,9 @@ function checkNetworkOnLoad() {
 
             /*  Add eventListener to the input field.   */
             input.addEventListener("input", function (evt) {
-
-
-
+                /* Backspace and Delete buttons works, except when pressed fast. Need a solution for fix it.    */
                 if (evt.inputType === "deleteContentBackward" || evt.inputType === "deleteContentForward") {
-                    console.log("Delete");
+                    // console.log("Delete");
                     if(this.value.trim() === ""){
                         document.getElementById("content_div").innerHTML = "";
                         document.getElementById("percentage").textContent = "0";
@@ -405,24 +396,20 @@ function checkNetworkOnLoad() {
                         searchMovie(this.value);
                     }
                 }
-
                 /*  if the input is not empty after .trim() then call the searchMovie() function. */
                 /*  .trim() is not supported in Internet Explorer 8 and earlier versions. */
                 if (this.value.trim() !== "") {
                     searchMovie(this.value);
                 }
-
             });
         } else {
             alert("Your browser not support WebWorkers!");
         }
-
     }
 }
 
 function checkLocalStorageUsage(lastSearchTerm, localStorageImages) {
-
-    console.log('%c checkLocalStorageUsage() called', 'background: #222; color: #bada55');
+    // console.log('%c checkLocalStorageUsage() called', 'background: #222; color: #bada55');
 
     let used = false;
 
@@ -442,7 +429,6 @@ function makeButtons(type, term) {
     let buttonsForRemove = document.getElementById("buttons_Nav");
     buttonsForRemove.innerHTML = '';
 
-
     for (let i = 0; i < searchTerms.length; i++) {
         let newB = document.createElement("li");
         newB.setAttribute("class", "buttons");
@@ -454,9 +440,10 @@ function makeButtons(type, term) {
         document.getElementById("buttons_Nav").appendChild(newB);
 
         /*  add event listeners to the buttons */
+        /*  Comment:    Later possible to reduce this part. */
         newB.addEventListener("click", function () {
             if (type === "checkNetwork") {
-                console.log("button pressed -> check Network because app offline");
+                // console.log("button pressed -> check Network because app offline");
                 /* double check the network when button clicked */
                 if (checkNetwork() === false) {
                     checkNetworkOnLoad();
@@ -467,7 +454,7 @@ function makeButtons(type, term) {
                 }
             }
             if (type === "searchNetwork") {
-                console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
+                // console.log("button pressed -> add " + searchTerms[i] + " into searchTerms");
                 /* double check the network when button clicked */
                 if (checkNetwork() === false) {
                     checkNetworkOnLoad();
@@ -536,20 +523,18 @@ function removeOnlineStatus(element) {
 
 function loadImagesFromCache(imagesFromLocalStorage) {
 
-    console.log('%c loadImagesFromCache() called', 'background: #222; color: #bada55');
+    // console.log('%c loadImagesFromCache() called', 'background: #222; color: #bada55');
 
     let newImageArray = [];
     let fromLocal = (imagesFromLocalStorage) ? JSON.parse(imagesFromLocalStorage) : [];
+    let promiseArray = [];
 
     for (let i = 0; i < fromLocal.length; i++) {
         let element = fromLocal[i];
         newImageArray.push(element);
     }
 
-    let promiseArray = [];
-
     document.getElementById('content_div').innerHTML = "";
-
 
     for (let i = 0; i < fromLocal.length; i++) {
 
@@ -578,7 +563,7 @@ function loadImagesFromCache(imagesFromLocalStorage) {
 
 function loadImage(url, title) {
 
-    console.log('%c loadImage() called', 'background: #222; color: #bada55');
+    // console.log('%c loadImage() called', 'background: #222; color: #bada55');
     /*  We are going to return a Promise when .then() will give us an Image that should be fully loaded. */
     return new Promise((resolve, reject) => {
         /*  Create the image that we are going to use to hold the resource.  */
@@ -612,10 +597,8 @@ function loadImage(url, title) {
     });
 }
 
-/*  Add a button to the page that allows you delete all the files
-    you downloaded from Flickr (and only those files) from the cache.
-    However, shouldn't delete the images of the last search
-    assuming there was one. */
+/*  Add a button to the page that allows you delete all the files you downloaded from Flickr (and only those files)
+    from the cache. However, shouldn't delete the images of the last search assuming there was one. */
 async function deleteCachedImages() {
 
     let images_LocalStorage = window.localStorage.getItem("images");
@@ -668,13 +651,13 @@ async function deleteCachedImages() {
             });
         }
     })
-
 }
 
 function searchMovie(searchText) {
 
-    console.log("The input was: " + searchText);
-    //Delaying the function execute
+    // console.log("The input was: " + searchText);
+
+    /*  Delaying the function execute */
     if (this.timer) {
         window.clearTimeout(this.timer);
     }
@@ -705,15 +688,10 @@ function searchMovie(searchText) {
                         });
                         document.getElementById("content_div").appendChild(button);
                     }
-                    // document.getElementById("content_div").innerHTML = e.data.title;
                 }
-
-
             }
-
         }
     }, 500);
-
 }
 
 function startWorker() {

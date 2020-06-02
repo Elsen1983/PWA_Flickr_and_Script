@@ -41,24 +41,20 @@
     one message.
 * */
 
+/*  Declare 'global' variables. */
 var movies = [];
-
 let filmTitleSearch = "";
 let outputMessage = {};
-
-
 let foundFilmNumber = 0;
-
 let currentPercentage = 0;
 let previousPercentage = 0;
 
-
+/*  Onmessage for incoming messages.    */
 onmessage = function (incomingMessage) {
 
-    console.log("Webworker called with: " + incomingMessage.data);
+    // console.log("Webworker called with: " + incomingMessage.data);
 
     filmTitleSearch = incomingMessage.data;
-
 
     try {
         /*  Import the movieObj.js for films 'database'.  */
@@ -68,10 +64,8 @@ onmessage = function (incomingMessage) {
         postMessage(error);
     }
 
-
     for (let i = 0; i < movies.length; i++) {
         currentPercentage = Math.round((i / movies.length) * 100);
-
 
         if (previousPercentage !== currentPercentage) {
             previousPercentage = currentPercentage;
@@ -79,25 +73,20 @@ onmessage = function (incomingMessage) {
                 postMessage(currentPercentage);
                 console.log("percentage: " + currentPercentage);
             //}, 100);
-
         }
-        // if (previousPercentage === 100) {
-        //     postMessage(100);
-        //
-        // }
-
     }
-    postMessage(100);
 
     /*  display the first 100 result from 'movies' array.   */
     let resultMoviesLimit = 100;
     outputMessage = movies.slice(0, resultMoviesLimit).map(film => ({title: film.title, url: film.url}));
 
-    console.log(outputMessage);
+    // console.log(outputMessage);
     postMessage(outputMessage);
 
+    postMessage(100);
 }
 
+/*  processFilms function which automatically called when 'movieObj.js' imported.   */
 function processFilms(jsonp) {
     // console.log("ProcessFilms called ...");
     /*  Must clear the movies array every time when new call is happening from app.js.  */
@@ -116,20 +105,14 @@ function processFilms(jsonp) {
             foundFilmNumber = movies.length + 1;
             movies.push(filmObject);
         }
-
     }
-    console.log("ProcessFilms Search finished...");
+    // console.log("ProcessFilms Search finished...");
 }
-
 
 /*  Use this function to put <mark>text<mark> into the result title. In app.js use it to highlight the result.*/
 function markTitleSearch(text, term) {
     return text.replace(new RegExp(term, "ig"), "<span class='insideSpan'>$&</span>");
 }
-
-
-
-
 
 /*  Used references */
 /*  Using Web Workers : https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers  */

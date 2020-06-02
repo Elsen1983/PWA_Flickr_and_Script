@@ -378,8 +378,6 @@ progress[value]::-webkit-progress-bar {
   }
   #container {
     grid-template-columns: repeat(2, min-content);
-    /*grid-template-rows: fit-content(100%) minmax(min-content, auto) minmax(min-content, 1fr);*/
-    /*grid-template-rows: min-content fit-content(100%) min-content min-content;;*/
     grid-template-areas:
       "p p"
       "b c"
@@ -448,30 +446,10 @@ progress[value]::-webkit-progress-bar {
   #loader{
     left: calc(50% - 8px);
   }
-  /*#content_area #content div:nth-child(1),*/
-  /*#content_area #content div:nth-child(3),*/
-  /*#content_area #content div:nth-child(4),*/
-  /*#content_area #content div:nth-child(6),*/
-  /*#content_area #content div:nth-child(7),*/
-  /*#content_area #content div:nth-child(9),*/
-  /*#content_area #content div:nth-child(10)*/
-  /*{*/
-  /*  margin-left: 0;*/
-  /*}*/
-  /*#content_area #content div:nth-child(2),*/
-  /*#content_area #content div:nth-child(3),*/
-  /*#content_area #content div:nth-child(5),*/
-  /*#content_area #content div:nth-child(6),*/
-  /*#content_area #content div:nth-child(8),*/
-  /*#content_area #content div:nth-child(9)*/
-  /*{*/
-  /*  margin-right: 0;*/
-  /*}*/
   #footer_container {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: none
   }
-
   #footer_container li {
     justify-self: center
   }

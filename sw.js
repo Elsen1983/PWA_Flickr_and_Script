@@ -37,7 +37,6 @@ const mutable_cache_Files = [
     wasn't in the cache (if found online then add it to the cache). Call it when the installation phase starts. */
 self.addEventListener('install', function (e) {
     log(' Installing');
-
     e.waitUntil(
         /* Open 'cache_Name' from the caches */
         caches
@@ -76,7 +75,6 @@ self.addEventListener('install', function (e) {
             })
     );
 });
-
 
 /*  ----------------------- 2 - Call 'activate' event for the service worker -----------------------    */
 /*  Call it when the activation phase starts.   */
@@ -124,8 +122,7 @@ self.addEventListener('fetch', function (e) {
 
     /*  Parse the URL   */
     const requestURL = new URL(e.request.url);
-    console.log('Fetch intercepted for:', requestURL);
-
+    // console.log('Fetch intercepted for:', requestURL);
 
     /*  Switch-case for different cases in cache policy.    */
     switch (requestURL.hostname) {
@@ -223,18 +220,17 @@ self.addEventListener('fetch', function (e) {
 
 /*  ----------------------- 4 - Functions -----------------------   */
 
-
-/*  Request.destination : https://developer.mozilla.org/en-US/docs/Web/API/Request/destination  */
-function isImage(fetchRequest) {
-    return (
-        fetchRequest.method === 'GET' && fetchRequest.destination === 'image'
-    );
-}
-
 /*  Each logging line will be prepended with the service worker version */
 function log(message) {
     console.log("%c [ServiceWorker - '" + cache_Name + "]", 'background: #FFFFFF; color: #329011', message);
 }
+
+/*  Request.destination : https://developer.mozilla.org/en-US/docs/Web/API/Request/destination  */
+// function isImage(fetchRequest) {
+//     return (
+//         fetchRequest.method === 'GET' && fetchRequest.destination === 'image'
+//     );
+// }
 
 
 /*  ----------------------- 5 - Extra Information -----------------------  */
