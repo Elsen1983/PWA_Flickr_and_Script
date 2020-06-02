@@ -19,6 +19,19 @@ button, input, select, textarea {
   font-size: 100%;
 }
 
+#installBanner {
+  align-content: center;
+  display: none;
+  justify-content: center;
+  width: 100%;
+}
+#installBtn{
+  width: 100%;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border: 1px blue solid;
+  margin-bottom: 5px;
+}
 
 /*  ---- CSS for Mobile size */
 /*  CONTAINER */
@@ -160,6 +173,15 @@ input[type=text]:focus {
   color: crimson;
   font-size: 1.2em;
 }
+
+#percentHolder{
+  width: 3em;
+  /* height: 3em; */
+  border: 2px solid black;
+  padding: 5px;
+  text-align: center;
+  margin: 1em auto;
+}
 progress:not([value]) {
   /* Styling here */
 }
@@ -167,8 +189,7 @@ progress[value] {
   /* Reset the default appearance */
   -webkit-appearance: none;
   appearance: none;
-
-  width: 250px;
+  width: 70vw;
   height: 20px;
 }
 
@@ -213,6 +234,7 @@ progress[value]::-webkit-progress-bar {
   z-index: 10;
   background-color: white;
   font-size: 1em;
+  background-color: rgba(224, 224, 224, 0.58);
 }
 #footer_container{
   display: grid;
@@ -290,6 +312,7 @@ progress[value]::-webkit-progress-bar {
   #title{
     position: relative;
     padding-left: 20px;
+    min-height: 3.5em;
   }
   #title p{
     font-size: 2rem;
@@ -414,6 +437,10 @@ progress[value]::-webkit-progress-bar {
   }
   #content_area{
     overflow: hidden;
+  }
+  progress[value] {
+    width: 900px;
+    height: 20px;
   }
   #content{
     overflow: auto;

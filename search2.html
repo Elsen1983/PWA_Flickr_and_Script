@@ -46,8 +46,9 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
-
-<!-- Add your site or application content here -->
+<section id="installBanner" class="banner">
+    <button id="installBtn">Install the application.</button>
+</section>
 <div id="container">
     <div id="product_p">
         <h3>Use the search box to find a film script.</h3>
@@ -65,16 +66,19 @@
     <div id="search_box">
         <div id="searchDiv">
             <label>
-                <input id="searchField" type="text" name="search" placeholder="Enter some text">
+                <input id="searchField" type="text" name="search" placeholder="Enter some text" autocomplete="off">
             </label>
             <img id="search_icon" src="img/search_icon.svg" alt="search">
         </div>
     </div>
     <div id="content_area">
         <div id="topOfContent"></div>
-        <div id="percentage">
-            0
+        <div id="percentHolder">
+            <div id="percentage">
+                0
+            </div>
         </div>
+
         <progress id="progressBar" value="1" max="100"></progress>
         <!--    <div id="loading_txt">Searching Flickr ...</div>-->
         <div id="content_div">
@@ -88,7 +92,38 @@
         </ul>
     </div>
 </div>
+<script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', event => {
 
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        event.preventDefault();
+
+        // Stash the event so it can be triggered later.
+        deferredPrompt = event;
+
+        // Attach the install prompt to a user gesture
+        document.querySelector('#installBtn').addEventListener('click', event => {
+
+            // Show the prompt
+            deferredPrompt.prompt();
+
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice
+                .then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                    } else {
+                        console.log('User dismissed the A2HS prompt');
+                    }
+                    deferredPrompt = null;
+                });
+        });
+
+        // Update UI notify the user they can add to home screen
+        document.querySelector('#installBanner').style.display = 'flex';
+    });
+</script>
 
 <script src="js/app.js"></script>
 <script src="js/vendor/modernizr-3.7.1.min.js"></script>

@@ -13,7 +13,7 @@ body {
   overflow-x: hidden
 }
 
-.banner {
+#installBanner {
   align-content: center;
   display: none;
   justify-content: center;

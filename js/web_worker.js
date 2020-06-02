@@ -81,10 +81,10 @@ onmessage = function (incomingMessage) {
             //}, 100);
 
         }
-        if (previousPercentage === 100) {
-            postMessage(100);
-
-        }
+        // if (previousPercentage === 100) {
+        //     postMessage(100);
+        //
+        // }
 
     }
     postMessage(100);

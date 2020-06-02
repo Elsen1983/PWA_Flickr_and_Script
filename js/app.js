@@ -1,4 +1,4 @@
-/* ----------------------- Declare the variables ----------------------- */
+/* ----------------------- Declare the 'global' variables ----------------------- */
 const searchTerms = ["Ivan Aivazovsky", "Henry Pether", "Robin Jacques"];
 var images_Array = [];
 var buttons = document.getElementsByClassName("buttons");
@@ -12,7 +12,6 @@ window.addEventListener('resize', resizePage);
 function init() {
     onloadFunction();
     checkNetworkOnLoad();
-
 }
 
 /*  ----------------------- Search Flickr - getImages -----------------------    */
@@ -20,7 +19,7 @@ function getImages(searchTermText) {
 
     addArrowButtons();
 
-    console.log('%c getImages() called with ' + searchTermText, 'background: #222; color: #bada55');
+    // console.log('%c getImages() called with ' + searchTermText, 'background: #222; color: #bada55');
 
     let base_url = "https://www.flickr.com/services/rest?";
     let request = "method=flickr.photos.search";
@@ -119,24 +118,18 @@ function FlickrImage(image_URL, image_Title, image_NameAndExtension) {
 }
 
 FlickrImage.prototype.getImageObject = function () {
-
     return new Promise((resolve, reject) => {
         // Create an image object
         let imageObject = new Image();
         imageObject.src = this.imageSRC;
-
         document.getElementById("loading_txt").style.display = "none";
-
         imageObject.onload = () => {
-
             imageObject.onclick = () => {
                 console.log("Modal activated on clicked image :" + this.imageTitle);
                 imageTitleOnModal(this.imageTitle)
             };
-
             resolve(imageObject);
         };
-
         imageObject.onerror = () => {
             imageObject.innerHTML = "Can't Load";
             reject();
@@ -145,7 +138,6 @@ FlickrImage.prototype.getImageObject = function () {
 };
 
 function imageTitleOnModal(getTitle) {
-    // console.log("getModalAndZoomImages called with title: " + getTitle);
     const modalPlace = document.getElementById("body_Tag");
     let modal = document.createElement("div");
     modal.setAttribute("id", "modal");
@@ -166,12 +158,11 @@ function imageTitleOnModal(getTitle) {
 
 /* ------------------------ Place Images on the Page ------------ */
 function createImages(flickr_array) {
-    console.log("%c createImages() called", 'background: #222; color: #bada55');
-    console.log(flickr_array);
+    // console.log("%c createImages() called", 'background: #222; color: #bada55');
+    // console.log(flickr_array);
     let promiseArray = [];
 
     for (let i = 0; i < flickr_array.length; i++) {
-
         let divObj = document.createElement("li");
         divObj.className = "imageTag";
         let loader = document.createElement("img");
@@ -205,7 +196,6 @@ function createImages(flickr_array) {
 function enableButtons() {
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].style.cursor = "pointer"; //This makes it clickable
-        // buttons[i].style.pointerEvents = "pointer";
         buttons[i].style.opacity = "1"; //This grays it out to look not disabled
     }
 }
@@ -213,7 +203,6 @@ function enableButtons() {
 function disableButtons() {
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].style.cursor = "none"; //This makes it not clickable
-        // buttons[i].style.pointerEvents = "none";
         buttons[i].style.opacity = "0.6"; //This grays it out to look disabled
     }
 }
@@ -233,6 +222,23 @@ function hide_Menu() {
 
 /*  Hide some element from the DOM. Must use it because JS not reading the CSS style on onload (just inline style). */
 function onloadFunction() {
+
+    /*  1 - Increase the height of the footer when the 'InstallApplication' button is displayed on the top area.    */
+    let installButton = document.getElementById("installBanner");
+    let footer = document.getElementById("footer_container");
+
+    console.log(installButton.style.display);
+
+    if(installButton.style.display !== "none"){
+        console.log("installBtn there");
+        footer.style.marginBottom = "25px";
+    }
+    if(installButton.style.display === "none"){
+        console.log("installBtn isn't there");
+       footer.style.marginBottom = "0px";
+    }
+
+    /*  2 - Change 'product_inner_container' depends on the screen current size.    */
     const x = document.getElementById("product_inner_container");
     if (window.innerWidth > 479) {
         x.style.display = "flex";
@@ -304,6 +310,7 @@ function checkNetworkOnLoad() {
         console.log("---- Flickr Search ----");
         console.log("-----------------------\n");
 
+
         let last_search_term = window.localStorage.getItem("last_search");
         let images_LocalStorage = window.localStorage.getItem("images");
 
@@ -362,9 +369,6 @@ function checkNetworkOnLoad() {
                 /*  create the buttons */
                 makeButtons("searchNetwork", last_search_term);
                 selectUsedButton(last_search_term);
-
-
-                // loadImagesFromCache();
 
             }
 
@@ -717,6 +721,7 @@ function startWorker() {
         webWorker = new Worker("./js/web_worker.js");
     }
 }
+
 function stopWorker() {
     webWorker.terminate();
     webWorker = undefined;
