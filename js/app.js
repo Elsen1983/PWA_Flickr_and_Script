@@ -679,14 +679,20 @@ function searchMovie(searchText) {
                     document.getElementById("progressBar").value = e.data;
                 }
                 else{
-                    for(let i =0; i < e.data.length; i++){
-                        let button = document.createElement("button");
-                        button.setAttribute("class", "openLinkButton");
-                        button.innerHTML = e.data[i].title;
-                        button.addEventListener("click", function () {
-                            window.open(e.data[i].url);
-                        });
-                        document.getElementById("content_div").appendChild(button);
+                    if(e.data === "finished"){
+                        document.getElementById("percentage").textContent = "100";
+                        document.getElementById("progressBar").value = 100;
+                    }
+                    else{
+                        for(let i =0; i < e.data.length; i++){
+                            let button = document.createElement("button");
+                            button.setAttribute("class", "openLinkButton");
+                            button.innerHTML = e.data[i].title;
+                            button.addEventListener("click", function () {
+                                window.open(e.data[i].url);
+                            });
+                            document.getElementById("content_div").appendChild(button);
+                        }
                     }
                 }
             }

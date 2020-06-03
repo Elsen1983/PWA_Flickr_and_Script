@@ -83,7 +83,9 @@ onmessage = function (incomingMessage) {
     // console.log(outputMessage);
     postMessage(outputMessage);
 
-    postMessage(100);
+    // console.log("ProcessFilms Search finished...");
+    postMessage("finished");
+
 }
 
 /*  processFilms function which automatically called when 'movieObj.js' imported.   */
@@ -106,7 +108,7 @@ function processFilms(jsonp) {
             movies.push(filmObject);
         }
     }
-    // console.log("ProcessFilms Search finished...");
+
 }
 
 /*  Use this function to put <mark>text<mark> into the result title. In app.js use it to highlight the result.*/
